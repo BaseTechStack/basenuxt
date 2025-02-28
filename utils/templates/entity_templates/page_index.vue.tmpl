@@ -1,0 +1,244 @@
+<template>
+  <div>
+    <div class="p-4">
+      <div class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-bold">{{.PluralName}}</h1>
+        <div class="flex items-center gap-4">
+          <div class="flex items-center space-x-2">
+            <UButtonGroup size="xl" class="border border-gray-200 dark:border-gray-800 rounded-md">
+              <UButton
+                :color="store.viewMode === 'grid' ? 'primary' : 'neutral'"
+                @click="store.setViewMode('grid')"
+                icon="i-heroicons-squares-2x2"
+                variant="ghost"
+                size="sm"
+              />
+              <UButton
+                :color="store.viewMode === 'table' ? 'primary' : 'neutral'"
+                @click="store.setViewMode('table')"
+                icon="i-heroicons-table-cells"
+                variant="ghost"
+                size="sm"
+              />
+            </UButtonGroup>
+          </div>
+        
+          <UButton
+            color="primary"
+            icon="i-heroicons-plus"
+            @click="modalState.add.isOpen = true"
+          >
+            Add {{.StructName}}
+          </UButton>
+        </div>
+      </div>
+      
+      <!-- Pagination -->
+      <div class="mt-6 flex py-5 justify-between items-center">
+        <BasePerPage
+          :pageSize="store.pagination.pageSize"
+          @update:pageSize="handlePageSizeChange"
+          :options="store.viewMode === 'grid' ? [12, 24, 36, 48] : [10, 20, 50, 100]"
+        />
+      
+        <BasePagination
+          :total="store.pagination.total"
+          :page="store.pagination.page"
+          :items-per-page="store.pagination.pageSize"
+          :total-pages="store.pagination.totalPages"
+          @update:page="handlePageChange"
+        />
+      </div>
+      <!-- Page Content -->
+      <Grid 
+        v-if="store.viewMode === 'grid' && store.{{.StructName | toLower}}s.length > 0" 
+        :{{.StructName | toLower}}s="store.{{.StructName | toLower}}s" 
+        @edit="edit{{.StructName}}" 
+        @delete="delete{{.StructName}}" 
+        @view="view{{.StructName}}"
+        :current-page="store.pagination.page"
+        :page-size="store.pagination.pageSize"
+      />
+      <Table 
+        v-else-if="store.viewMode === 'table' && store.{{.StructName | toLower}}s.length > 0"
+        :{{.StructName | toLower}}s="store.{{.StructName | toLower}}s" 
+        @edit="edit{{.StructName}}" 
+        @delete="delete{{.StructName}}" 
+        @view="view{{.StructName}}"
+        :current-page="store.pagination.page"
+        :page-size="store.pagination.pageSize"
+      />
+
+      <!-- Empty State -->
+      <div v-if="store.{{.StructName | toLower}}s.length === 0" class="text-center py-12">
+        <UIllustration name="empty" class="mx-auto h-40 w-40 text-gray-300" />
+        <h3 class="mt-4 text-lg font-medium text-gray-900">No {{.PluralName}}</h3>
+        <p class="mt-1 text-sm text-gray-500">Get started by creating a new {{.StructName | toLower}}.</p>
+        <div class="mt-6">
+          <UButton color="primary" @click="modalState.add.isOpen = true">
+            Add {{.StructName}}
+          </UButton>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modals -->
+    <AddModal{{.StructName}} 
+      v-model="modalState.add.isOpen" 
+      @{{.StructName | toLower}}-added="handle{{.StructName}}Added"
+    />
+    
+    <EditModal{{.StructName}} 
+      v-model="modalState.edit.isOpen" 
+      :{{.StructName | toLower}}="modalState.edit.{{.StructName | toLower}}"
+      @{{.StructName | toLower}}-updated="handle{{.StructName}}Updated"
+    />
+    
+    <ViewModal{{.StructName}} 
+      v-model="modalState.view.isOpen" 
+      :{{.StructName | toLower}}="modalState.view.{{.StructName | toLower}}"
+    /> 
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref, onMounted, computed } from 'vue'
+import { use{{.PluralName}}Store } from '../stores/{{.StructName | toLower}}sStore'
+import type { {{.StructName}} } from '../stores/{{.StructName | toLower}}'
+import { format } from 'date-fns'
+
+interface ModalState {
+  add: {
+    isOpen: boolean
+    loading?: boolean
+  }
+  edit: {
+    isOpen: boolean
+    {{.StructName | toLower}}?: {{.StructName}}
+    loading?: boolean
+  }
+  view: {
+    isOpen: boolean
+    {{.StructName | toLower}}?: {{.StructName}}
+  }
+  delete: {
+    isOpen: boolean
+    {{.StructName | toLower}}?: {{.StructName}}
+    loading?: boolean
+  }
+}
+
+const store = use{{.PluralName}}Store()
+
+const modalState = ref<ModalState>({
+  add: { isOpen: false },
+  edit: { isOpen: false },
+  view: { isOpen: false },
+  delete: { isOpen: false }
+})
+
+const columns = [
+  { key: 'id', label: 'ID' },
+  {{range .Fields}}
+  { key: '{{.JSONName}}', label: '{{.JSONName | toPascal}}' },
+  {{end}}
+  { key: 'createdAt', label: 'Created' },
+  { key: 'actions', label: 'Actions' }
+]
+
+onMounted(async () => {
+  await store.fetch{{.PluralName}}()
+})
+
+function formatDate(dateString: string) {
+  try {
+    return format(new Date(dateString), 'PPP')
+  } catch (e) {
+    return dateString
+  }
+}
+
+function edit{{.StructName}}({{.StructName | toLower}}: {{.StructName}}) {
+  modalState.value.edit.{{.StructName | toLower}} = {{.StructName | toLower}}
+  modalState.value.edit.isOpen = true
+}
+
+function view{{.StructName}}({{.StructName | toLower}}: {{.StructName}}) {
+  modalState.value.view.{{.StructName | toLower}} = {{.StructName | toLower}}
+  modalState.value.view.isOpen = true
+}
+
+function delete{{.StructName}}({{.StructName | toLower}}: {{.StructName}}) {
+  modalState.value.delete.{{.StructName | toLower}} = {{.StructName | toLower}}
+  modalState.value.delete.isOpen = true
+}
+
+function switchViewToEdit() {
+  const {{.StructName | toLower}} = modalState.value.view.{{.StructName | toLower}}
+  closeModal('view')
+  if ({{.StructName | toLower}}) {
+    edit{{.StructName}}({{.StructName | toLower}})
+  }
+}
+
+function closeModal(type: 'add' | 'edit' | 'view') {
+  modalState.value[type].isOpen = false
+  if (type === 'edit' || type === 'view') {
+    modalState.value[type].{{.StructName | toLower}} = undefined
+  }
+}
+
+function handlePageChange(page: number) {
+  store.pagination.page = page
+  store.fetch{{.PluralName}}()
+}
+
+function handlePageSizeChange(size: number) {
+  store.pagination.pageSize = size
+  store.pagination.page = 1
+  store.fetch{{.PluralName}}()
+}
+
+async function handle{{.StructName}}Added(data: Omit<{{.StructName}}, 'id' | 'createdAt' | 'updatedAt'>) {
+  modalState.value.add.loading = true
+  try {
+    await store.create{{.StructName}}(data)
+    modalState.value.add.isOpen = false
+  } catch (error) {
+    console.error('Error adding {{.StructName | toLower}}:', error)
+  } finally {
+    modalState.value.add.loading = false
+  }
+}
+
+async function handle{{.StructName}}Updated(data: Omit<{{.StructName}}, 'id' | 'createdAt' | 'updatedAt'>) {
+  if (!modalState.value.edit.{{.StructName | toLower}}) return
+  
+  modalState.value.edit.loading = true
+  try {
+    await store.update{{.StructName}}({
+      id: modalState.value.edit.{{.StructName | toLower}}.id,
+      ...data
+    })
+    modalState.value.edit.isOpen = false
+  } catch (error) {
+    console.error('Error updating {{.StructName | toLower}}:', error)
+  } finally {
+    modalState.value.edit.loading = false
+  }
+}
+
+async function confirmDelete() {
+  if (!modalState.value.delete.{{.StructName | toLower}}) return
+  
+  modalState.value.delete.loading = true
+  try {
+    await store.delete{{.StructName}}(modalState.value.delete.{{.StructName | toLower}}.id)
+    modalState.value.delete.isOpen = false
+  } catch (error) {
+    console.error('Error deleting {{.StructName | toLower}}:', error)
+  } finally {
+    modalState.value.delete.loading = false
+  }
+}
+</script>

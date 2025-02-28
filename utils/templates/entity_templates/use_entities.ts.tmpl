@@ -1,0 +1,52 @@
+import type { {{.StructName}} } from '../stores/{{.StructName | toLower}}'
+import type { BasePagination } from '@@/app/types/base'
+import { useApi } from '@@/app/composables/useApi'
+
+interface ApiResponse<T> {
+  data: T
+  pagination?: {
+    total: number
+    page: number
+    total_pages: number
+  }
+}
+
+export const use{{.PluralName}} = () => {
+  const api = useApi()
+
+  const fetch{{.PluralName}} = async (page = 1, pageSize = 10) => {
+    console.log('use{{.PluralName}}.fetch{{.PluralName}} called with page:', page, 'pageSize:', pageSize)
+    const result = await api.get(`/{{.PluralName | toLower}}?page=${page}&limit=${pageSize}`)
+    console.log('use{{.PluralName}} API response:', result)
+    const total = result.pagination?.total || 0
+    const pagination: BasePagination = {
+      total: total,
+      page: result.pagination?.page || 1,
+      pageSize: pageSize,
+      totalPages: Math.max(1, Math.ceil(total / pageSize))
+    }
+    console.log('use{{.PluralName}} returning pagination:', pagination)
+    return { {{.PluralName | toLower}}: result.data, pagination }
+  }
+
+  const create{{.StructName}} = async ({{.StructName | toLower}}Data: Omit<{{.StructName}}, 'id'>) => {
+    const result = await api.post('/{{.PluralName | toLower}}', {{.StructName | toLower}}Data)
+    return { {{.StructName | toLower}}: result.data }
+  }
+
+  const update{{.StructName}} = async (id: number, {{.StructName | toLower}}Data: Partial<Omit<{{.StructName}}, 'id'>>) => {
+    const result = await api.put(`/{{.PluralName | toLower}}/${id}`, {{.StructName | toLower}}Data)
+    return { {{.StructName | toLower}}: result.data }
+  }
+
+  const delete{{.StructName}} = async (id: number) => {
+    await api.delete(`/{{.PluralName | toLower}}/${id}`)
+  }
+
+  return {
+    fetch{{.PluralName}},
+    create{{.StructName}},
+    update{{.StructName}},
+    delete{{.StructName}}
+  }
+}

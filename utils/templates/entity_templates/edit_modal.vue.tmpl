@@ -1,0 +1,105 @@
+<template>
+  <UModal 
+    v-model:open="isOpen" 
+    :title="title || 'Edit {{.StructName}}'"
+    :description="description || 'Update this {{.StructName | toLower}}'"
+  >
+    <template #body>
+      <form @submit.prevent="handleSubmit">
+        <div class="space-y-4">
+          {{range .Fields}}
+          <UFormField label="{{.JSONName | toPascal}}" {{if .IsRequired}}required{{end}}>
+            {{if eq .Type "boolean"}}
+            <UCheckbox v-model="formData.{{.JSONName}}" {{if .IsRequired}}required{{end}} />
+            {{else}}
+            <UInput 
+              v-model="formData.{{.JSONName}}" 
+              {{if .IsRequired}}required{{end}}
+              {{if eq .Type "string"}}
+                {{if contains .JSONName "email"}}type="email"{{end}}
+                {{if contains .JSONName "password"}}type="password"{{end}}
+                {{if contains .JSONName "phone"}}type="tel"{{end}}
+                {{if contains .JSONName "date"}}type="date"{{end}}
+              {{end}}
+              {{if eq .Type "number"}}type="number"{{end}}
+            />
+            {{end}}
+          </UFormField>
+          {{end}}
+        </div>
+      </form>
+    </template>
+
+    <template #footer>
+      <div class="flex justify-end gap-2">
+        <UButton
+          color="neutral"
+          variant="ghost"
+          @click="closeModal"
+        >
+          Cancel
+        </UButton>
+        <UButton
+          color="primary"
+          :loading="loading"
+          @click="handleSubmit"
+        >
+          Update
+        </UButton>
+      </div>
+    </template>
+  </UModal>
+</template>
+
+<script setup lang="ts">
+import { ref, computed, reactive, watch } from 'vue'
+import type { {{.StructName}} } from '../stores/{{.StructName | toLower}}'
+
+const props = defineProps<{
+  modelValue?: boolean
+  {{.StructName | toLower}}?: {{.StructName}}
+  title?: string
+  description?: string
+  loading?: boolean
+}>()
+
+const emit = defineEmits<{
+  (e: 'update:modelValue', value: boolean): void
+  (e: 'submit', id: string, data: Partial<{{.StructName}}>): void
+}>()
+
+const isOpen = computed({
+  get() {
+    return props.modelValue
+  },
+  set(value) {
+    emit('update:modelValue', value)
+  }
+})
+
+const formData = reactive<Partial<{{.StructName}}>>({
+  {{range .Fields}}
+  {{.JSONName}}: {{if eq .Type "boolean"}}false{{else if eq .Type "number"}}0{{else}}''{{end}},
+  {{end}}
+})
+
+// Watch for changes to the {{.StructName | toLower}} prop and update form data
+watch(() => props.{{.StructName | toLower}}, (new{{.StructName}}) => {
+  if (new{{.StructName}}) {
+    {{range .Fields}}
+    formData.{{.JSONName}} = new{{$.StructName}}.{{.JSONName}} || {{if eq .Type "boolean"}}false{{else if eq .Type "number"}}0{{else}}''{{end}}
+    {{end}}
+  }
+}, { immediate: true })
+
+function closeModal() {
+  isOpen.value = false
+}
+
+function handleSubmit() {
+  if (props.{{.StructName | toLower}}?.id) {
+    emit('submit', props.{{.StructName | toLower}}.id, { ...formData })
+  }
+  closeModal()
+}
+</script>
