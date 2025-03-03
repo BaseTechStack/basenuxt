@@ -5,6 +5,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"os/exec"
 	"path/filepath"
 
 	"github.com/BaseTechStack/basenuxt/utils"
@@ -93,5 +94,53 @@ func createNewProject(cmd *cobra.Command, args []string) {
 	}
 
 	fmt.Printf("New project '%s' created successfully at %s\n", projectName, absPath)
+	
+	// Install dependencies
+	fmt.Println("Installing dependencies...")
+	
+	// Check if bun is available
+	bunCmd := exec.Command("bun", "--version")
+	bunAvailable := bunCmd.Run() == nil
+	
+	// Check if yarn is available
+	yarnCmd := exec.Command("yarn", "--version")
+	yarnAvailable := yarnCmd.Run() == nil
+	
+	// Change to the project directory
+	originalDir, err := os.Getwd()
+	if err != nil {
+		fmt.Printf("Error getting current directory: %v\n", err)
+		return
+	}
+	defer os.Chdir(originalDir) // Change back to original directory when done
+	
+	if err := os.Chdir(absPath); err != nil {
+		fmt.Printf("Error changing to project directory: %v\n", err)
+		return
+	}
+	
+	// Run bun, yarn or npm install based on availability (in that order of preference)
+	var installCmd *exec.Cmd
+	if bunAvailable {
+		fmt.Println("Using bun to install dependencies...")
+		installCmd = exec.Command("bun", "install")
+	} else if yarnAvailable {
+		fmt.Println("Using yarn to install dependencies...")
+		installCmd = exec.Command("yarn", "install")
+	} else {
+		fmt.Println("Using npm to install dependencies...")
+		installCmd = exec.Command("npm", "install")
+	}
+	
+	installCmd.Stdout = os.Stdout
+	installCmd.Stderr = os.Stderr
+	
+	if err := installCmd.Run(); err != nil {
+		fmt.Printf("Error installing dependencies: %v\n", err)
+		fmt.Println("You may need to run 'npm install', 'yarn install', or 'bun install' manually.")
+	} else {
+		fmt.Println("Dependencies installed successfully!")
+	}
+	
 	fmt.Println("You can now start working on your new project!")
 }
