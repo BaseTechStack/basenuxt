@@ -8,8 +8,8 @@ function Get-LatestRelease {
         return $release.tag_name
     }
     catch {
-        Write-Error "Failed to get latest release: $_"
-        exit 1
+        Write-Warning "Failed to get latest release: $_. Using default v0.1.0"
+        return "v0.1.0"
     }
 }
 
@@ -28,7 +28,7 @@ $arch = if ([Environment]::Is64BitOperatingSystem) { "amd64" } else { "386" }
 Write-Host "Architecture: windows_$arch"
 
 # Set installation paths
-$installDir = Join-Path $env:USERPROFILE ".base"
+$installDir = Join-Path $env:USERPROFILE ".basenuxt"
 $binDir = Join-Path $env:USERPROFILE "bin"
 
 # Create directories

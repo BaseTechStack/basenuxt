@@ -43,38 +43,40 @@ fi
 mkdir -p "$INSTALL_DIR"
 mkdir -p "$BIN_DIR" 2>/dev/null || {
     echo "Error: Unable to create $BIN_DIR directory. Please run with sudo:"
-    echo "curl -sSL https://raw.githubusercontent.com/BaseTechStack/basenuxt/main/install.sh | sudo bash"
+    echo "sudo ./install_local.sh"
     exit 1
 }
 
-echo "Installing BaseNuxt CLI..."
+echo "Installing BaseNuxt CLI locally..."
 echo "OS: $OS"
 echo "Architecture: $ARCH"
 
-# Get the latest release version
-LATEST_RELEASE=$(curl -s https://api.github.com/repos/BaseTechStack/basenuxt/releases/latest | grep "tag_name" | cut -d '"' -f 4)
-if [ -z "$LATEST_RELEASE" ]; then
-    echo "Warning: Could not determine latest version, using default v0.1.0"
-    LATEST_RELEASE="v0.1.0"
-fi
+# Use local files
+VERSION="v0.1.0"
+echo "Version: $VERSION"
 
-echo "Latest version: $LATEST_RELEASE"
-
-# Download the appropriate binary
-DOWNLOAD_URL="https://github.com/BaseTechStack/basenuxt/releases/download/$LATEST_RELEASE/basenuxt_${OS}_${ARCH}.tar.gz"
+# Path to local archive
+LOCAL_ARCHIVE=""
 if [ "$OS" = "windows" ]; then
-    DOWNLOAD_URL="https://github.com/BaseTechStack/basenuxt/releases/download/$LATEST_RELEASE/basenuxt_${OS}_${ARCH}.zip"
+    LOCAL_ARCHIVE="basenuxt_${OS}_${ARCH}.zip"
+else
+    LOCAL_ARCHIVE="basenuxt_${OS}_${ARCH}.tar.gz"
 fi
 
-echo "Downloading from: $DOWNLOAD_URL"
+if [ ! -f "$LOCAL_ARCHIVE" ]; then
+    echo "Error: Local archive $LOCAL_ARCHIVE not found"
+    echo "Make sure you run this script from the directory containing the release files"
+    exit 1
+fi
+
+echo "Using local archive: $LOCAL_ARCHIVE"
 TMP_DIR=$(mktemp -d)
 cd "$TMP_DIR"
 
 if [ "$OS" = "windows" ]; then
-    curl -sL "$DOWNLOAD_URL" -o basenuxt.zip
-    unzip basenuxt.zip
+    unzip "$OLDPWD/$LOCAL_ARCHIVE"
 else
-    curl -sL "$DOWNLOAD_URL" | tar xz
+    tar xzf "$OLDPWD/$LOCAL_ARCHIVE"
 fi
 
 # Install the binary
@@ -90,7 +92,7 @@ else
     echo "Creating symlink in $BIN_DIR (requires sudo)..."
     if ! sudo ln -sf "$INSTALL_DIR/$BINARY_NAME" "$BIN_DIR/$BINARY_NAME"; then
         echo "Error: Failed to create symlink. Please run the install script with sudo:"
-        echo "curl -sSL https://raw.githubusercontent.com/BaseTechStack/basenuxt/main/install.sh | sudo bash"
+        echo "sudo ./install_local.sh"
         exit 1
     fi
 fi
