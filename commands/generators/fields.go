@@ -3,6 +3,8 @@ package generators
 import (
 	"strings"
 	"unicode"
+
+	pluralize "github.com/gertd/go-pluralize"
 )
 
 // Field represents a struct field in the entity
@@ -49,17 +51,16 @@ func ParseFields(fieldStrs []string) []Field {
 
 // PluralizeEntityName converts a singular name to its plural form
 func PluralizeEntityName(name string) string {
-	// Basic English pluralization rules - these can be expanded
-	if strings.HasSuffix(name, "y") {
-		return strings.TrimSuffix(name, "y") + "ies"
-	} else if strings.HasSuffix(name, "s") ||
-		strings.HasSuffix(name, "x") ||
-		strings.HasSuffix(name, "z") ||
-		strings.HasSuffix(name, "ch") ||
-		strings.HasSuffix(name, "sh") {
-		return name + "es"
+	// Use the go-pluralize package for accurate pluralization
+	pluralizer := pluralize.NewClient()
+	
+	// If the word is already plural, return it as is
+	if pluralizer.IsPlural(name) {
+		return name
 	}
-	return name + "s"
+	
+	// Otherwise, return the plural form
+	return pluralizer.Plural(name)
 }
 
 // ToPascalCase converts a string to PascalCase

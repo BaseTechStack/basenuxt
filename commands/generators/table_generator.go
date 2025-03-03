@@ -4,22 +4,17 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strings"
-	"text/template"
 )
 
-// GenerateTable generates the Table.vue component for an entity
+// GenerateTable generates the Table component for an entity
 func GenerateTable(baseDir, componentsDir, entityName, pluralName string, fields []Field) error {
 	// Define the output path for the component
 	outputPath := filepath.Join(componentsDir, "Table.vue")
 
-	// Path to the Go template file
-	templatePath := filepath.Join(baseDir, "utils", "templates", "entity_templates", "table.vue.tmpl")
-
-	// Read the template content
-	templateContent, err := os.ReadFile(templatePath)
+	// Load the template from the embedded filesystem
+	templateContent, err := loadTemplate("table.vue.tmpl")
 	if err != nil {
-		return fmt.Errorf("error reading Table template: %v", err)
+		return err
 	}
 
 	// Create the component directory if it doesn't exist
@@ -27,19 +22,10 @@ func GenerateTable(baseDir, componentsDir, entityName, pluralName string, fields
 		return fmt.Errorf("error creating components directory: %v", err)
 	}
 
-	// Process the template with the Go templating engine
-	tmpl, err := template.New("table").Funcs(template.FuncMap{
-		"toLower":  strings.ToLower,
-		"toUpper":  strings.ToUpper,
-		"toPascal": ToPascalCase,
-		"toKebab":  ToKebabCase,
-		"ToPascal": ToPascalCase,
-		"ToKebab":  ToKebabCase,
-		"contains": strings.Contains,
-	}).Parse(string(templateContent))
-
+	// Create the template with common functions
+	tmpl, err := createTemplate("table", templateContent)
 	if err != nil {
-		return fmt.Errorf("error parsing Table template: %v", err)
+		return err
 	}
 
 	// Create a file to write the processed template
@@ -49,13 +35,13 @@ func GenerateTable(baseDir, componentsDir, entityName, pluralName string, fields
 	}
 	defer file.Close()
 
-	// Execute the template with data passed as a struct
+	// Execute the template with the data
 	data := struct {
-		StructName string
+		EntityName string
 		PluralName string
 		Fields     []Field
 	}{
-		StructName: entityName,
+		EntityName: entityName,
 		PluralName: pluralName,
 		Fields:     fields,
 	}

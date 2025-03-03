@@ -1,0 +1,49 @@
+import type { {{.StructName}} } from '../stores/{{.StructName | toLower}}'
+import type { BaseService } from '@@/app/services/baseService'
+import { use{{.PluralName}} } from '../composables/use{{.PluralName}}'
+import type { BasePagination } from '@@/app/types/base'
+
+// Adapt use{{.PluralName}} to implement the BaseService interface
+export class {{.StructName}}Service implements BaseService<{{.StructName}}> {
+  private {{.PluralName | toLower}}Api = use{{.PluralName}}()
+
+  async fetch(page = 1, pageSize = 10): Promise<{ items: {{.StructName}}[], pagination: BasePagination }> {
+    console.log('{{.StructName}}Service.fetch called with page:', page, 'pageSize:', pageSize)
+    const result = await this.{{.PluralName | toLower}}Api.fetch{{.PluralName}}(page, pageSize)
+    console.log('{{.StructName}}Service API response:', result)
+    return {
+      items: result.{{.PluralName | toLower}}.map(({{.StructName | toLower}}: {{.StructName}}) => ({
+        ...{{.StructName | toLower}},
+        id: Number({{.StructName | toLower}}.id)
+      })),
+      pagination: result.pagination
+    }
+  }
+
+  async create(data: Omit<{{.StructName}}, 'id'>): Promise<{ item: {{.StructName}} }> {
+    const result = await this.{{.PluralName | toLower}}Api.create{{.StructName}}(data)
+    return {
+      item: {
+        ...result.{{.StructName | toLower}},
+        id: Number(result.{{.StructName | toLower}}.id)
+      }
+    }
+  }
+
+  async update(id: number, data: Partial<Omit<{{.StructName}}, 'id'>>): Promise<{ item: {{.StructName}} }> {
+    const result = await this.{{.PluralName | toLower}}Api.update{{.StructName}}(id, data)
+    return {
+      item: {
+        ...result.{{.StructName | toLower}},
+        id: Number(result.{{.StructName | toLower}}.id)
+      }
+    }
+  }
+
+  async delete(id: number): Promise<void> {
+    await this.{{.PluralName | toLower}}Api.delete{{.StructName}}(id)
+  }
+}
+
+// Export singleton instance
+export const {{.StructName | toLower}}Service = new {{.StructName}}Service()

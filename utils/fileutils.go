@@ -76,7 +76,7 @@ func UpdateInitGo(packageName, structName string) error {
 	}
 
 	// Add import if not exists
-	importPath := fmt.Sprintf(`"base/app/%s"`, packageName)
+	importPath := fmt.Sprintf(`"basenuxt/app/%s"`, packageName)
 	contentStr := string(content)
 	if !strings.Contains(contentStr, importPath) {
 		importMarker := "// MODULE_IMPORT_MARKER"

@@ -5,7 +5,6 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"text/template"
 )
 
 // GenerateEntityType generates the entity.ts file with the TypeScript interface
@@ -13,13 +12,10 @@ func GenerateEntityType(baseDir, storesDir, entityName, pluralName string, field
 	// Define the output path for the entity type file
 	outputPath := filepath.Join(storesDir, strings.ToLower(entityName)+".ts")
 
-	// Path to the Go template file
-	templatePath := filepath.Join(baseDir, "utils", "templates", "entity_templates", "entity.ts.tmpl")
-
-	// Read the template content
-	templateContent, err := os.ReadFile(templatePath)
+	// Load the template from the embedded filesystem
+	templateContent, err := loadTemplate("entity.ts.tmpl")
 	if err != nil {
-		return fmt.Errorf("error reading entity.ts template: %v", err)
+		return err
 	}
 
 	// Create the directory if it doesn't exist
@@ -27,19 +23,10 @@ func GenerateEntityType(baseDir, storesDir, entityName, pluralName string, field
 		return fmt.Errorf("error creating stores directory: %v", err)
 	}
 
-	// Process the template with the Go templating engine
-	tmpl, err := template.New("entityType").Funcs(template.FuncMap{
-		"toLower":  strings.ToLower,
-		"toUpper":  strings.ToUpper,
-		"toPascal": ToPascalCase,
-		"toKebab":  ToKebabCase,
-		"ToPascal": ToPascalCase,
-		"ToKebab":  ToKebabCase,
-		"contains": strings.Contains,
-	}).Parse(string(templateContent))
-
+	// Create the template with common functions
+	tmpl, err := createTemplate("entityType", templateContent)
 	if err != nil {
-		return fmt.Errorf("error parsing entity.ts template: %v", err)
+		return err
 	}
 
 	// Create a file to write the processed template

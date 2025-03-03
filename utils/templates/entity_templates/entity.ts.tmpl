@@ -1,6 +1,0 @@
-export interface {{.StructName}} {
-  id: string;
-{{range .Fields}}  {{.JSONName}}{{if not .IsRequired}}?{{end}}: {{.Type}};
-{{end}}  createdAt: string;
-  updatedAt: string;
-}

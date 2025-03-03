@@ -4,37 +4,28 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strings"
-	"text/template"
 )
 
-// GenerateNuxtConfig generates the nuxt.config.ts file for an entity
-func GenerateNuxtConfig(baseDir, entityDir, entityName, pluralName string, fields []Field) error {
+// GenerateNuxtConfig generates the nuxt.config.ts file
+func GenerateNuxtConfig(baseDir, rootDir, entityName, pluralName string, fields []Field) error {
 	// Define the output path for the nuxt config
-	outputPath := filepath.Join(entityDir, "nuxt.config.ts")
+	outputPath := filepath.Join(rootDir, "nuxt.config.ts")
 
-	// Path to the Go template file
-	templatePath := filepath.Join(baseDir, "utils", "templates", "entity_templates", "nuxt.config.ts.tmpl")
-
-	// Read the template content
-	templateContent, err := os.ReadFile(templatePath)
+	// Load the template from the embedded filesystem
+	templateContent, err := loadTemplate("nuxt.config.ts.tmpl")
 	if err != nil {
-		return fmt.Errorf("error reading nuxt.config.ts template: %v", err)
+		return err
 	}
 
-	// Process the template with the Go templating engine
-	tmpl, err := template.New("nuxtconfig").Funcs(template.FuncMap{
-		"toLower":  strings.ToLower,
-		"toUpper":  strings.ToUpper,
-		"toPascal": ToPascalCase,
-		"toKebab":  ToKebabCase,
-		"ToPascal": ToPascalCase,
-		"ToKebab":  ToKebabCase,
-		"contains": strings.Contains,
-	}).Parse(string(templateContent))
+	// Create the root directory if it doesn't exist
+	if err := os.MkdirAll(rootDir, 0755); err != nil {
+		return fmt.Errorf("error creating root directory: %v", err)
+	}
 
+	// Create the template with common functions
+	tmpl, err := createTemplate("nuxt_config", templateContent)
 	if err != nil {
-		return fmt.Errorf("error parsing nuxt.config.ts template: %v", err)
+		return err
 	}
 
 	// Create a file to write the processed template
@@ -44,13 +35,13 @@ func GenerateNuxtConfig(baseDir, entityDir, entityName, pluralName string, field
 	}
 	defer file.Close()
 
-	// Execute the template with data passed as a struct
+	// Execute the template with the data
 	data := struct {
-		StructName string
+		EntityName string
 		PluralName string
 		Fields     []Field
 	}{
-		StructName: entityName,
+		EntityName: entityName,
 		PluralName: pluralName,
 		Fields:     fields,
 	}

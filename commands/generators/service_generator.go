@@ -4,22 +4,17 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strings"
-	"text/template"
 )
 
-// GenerateService generates the service file for an entity
+// GenerateService generates the service for an entity
 func GenerateService(baseDir, servicesDir, entityName, pluralName string, fields []Field) error {
 	// Define the output path for the service
-	outputPath := filepath.Join(servicesDir, fmt.Sprintf("%sService.ts", entityName))
+	outputPath := filepath.Join(servicesDir, ToCamelCase(entityName)+"Service.ts")
 
-	// Path to the Go template file
-	templatePath := filepath.Join(baseDir, "utils", "templates", "entity_templates", "entity_service.ts.tmpl")
-
-	// Read the template content
-	templateContent, err := os.ReadFile(templatePath)
+	// Load the template from the embedded filesystem
+	templateContent, err := loadTemplate("entity_service.ts.tmpl")
 	if err != nil {
-		return fmt.Errorf("error reading Service template: %v", err)
+		return err
 	}
 
 	// Create the services directory if it doesn't exist
@@ -27,41 +22,32 @@ func GenerateService(baseDir, servicesDir, entityName, pluralName string, fields
 		return fmt.Errorf("error creating services directory: %v", err)
 	}
 
-	// Process the template with the Go templating engine
-	tmpl, err := template.New("service").Funcs(template.FuncMap{
-		"toLower":  strings.ToLower,
-		"toUpper":  strings.ToUpper,
-		"toPascal": ToPascalCase,
-		"toKebab":  ToKebabCase,
-		"ToPascal": ToPascalCase,
-		"ToKebab":  ToKebabCase,
-		"contains": strings.Contains,
-	}).Parse(string(templateContent))
-
+	// Create the template with common functions
+	tmpl, err := createTemplate("service", templateContent)
 	if err != nil {
-		return fmt.Errorf("error parsing Service template: %v", err)
+		return err
 	}
 
 	// Create a file to write the processed template
 	file, err := os.Create(outputPath)
 	if err != nil {
-		return fmt.Errorf("error creating Service file: %v", err)
+		return fmt.Errorf("error creating service file: %v", err)
 	}
 	defer file.Close()
 
-	// Execute the template with data passed as a struct
+	// Execute the template with the data
 	data := struct {
-		StructName string
+		EntityName string
 		PluralName string
 		Fields     []Field
 	}{
-		StructName: entityName,
+		EntityName: entityName,
 		PluralName: pluralName,
 		Fields:     fields,
 	}
 
 	if err := tmpl.Execute(file, data); err != nil {
-		return fmt.Errorf("error executing Service template: %v", err)
+		return fmt.Errorf("error executing service template: %v", err)
 	}
 
 	fmt.Printf("Generated %s\n", outputPath)

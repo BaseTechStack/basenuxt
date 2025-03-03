@@ -4,51 +4,29 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strings"
-	"text/template"
 )
 
-// GeneratePage generates the main page for an entity
+// GeneratePage generates the page for an entity
 func GeneratePage(baseDir, pagesDir, entityName, pluralName string, fields []Field) error {
-	// Define the output path for the page file
-	outputPath := filepath.Join(pagesDir, "index.vue")
+	// Define the output path for the page
+	entityPageDir := filepath.Join(pagesDir, ToKebabCase(pluralName))
+	outputPath := filepath.Join(entityPageDir, "index.vue")
 
-	// Path to the Go template file
-	templatePath := filepath.Join(baseDir, "utils", "templates", "entity_templates", "page_index.vue.tmpl")
-
-	// Read the template content
-	templateContent, err := os.ReadFile(templatePath)
+	// Load the template from the embedded filesystem
+	templateContent, err := loadTemplate("page_index.vue.tmpl")
 	if err != nil {
-		return fmt.Errorf("error reading page template: %v", err)
+		return err
 	}
 
-	// Create the directory if it doesn't exist
-	if err := os.MkdirAll(pagesDir, 0755); err != nil {
+	// Create the pages directory if it doesn't exist
+	if err := os.MkdirAll(entityPageDir, 0755); err != nil {
 		return fmt.Errorf("error creating pages directory: %v", err)
 	}
 
-	// Process the template with the Go templating engine
-	tmpl, err := template.New("page").Funcs(template.FuncMap{
-		"toLower":  strings.ToLower,
-		"toUpper":  strings.ToUpper,
-		"toPascal": ToPascalCase,
-		"toKebab":  ToKebabCase,
-		"ToPascal": ToPascalCase,
-		"ToKebab":  ToKebabCase,
-		"contains": strings.Contains,
-		"formatDate": func(date string) string {
-			return date
-		},
-		"index": func(arr []Field, i int) Field {
-			if i >= 0 && i < len(arr) {
-				return arr[i]
-			}
-			return Field{}
-		},
-	}).Parse(string(templateContent))
-
+	// Create the template with common functions
+	tmpl, err := createTemplate("page", templateContent)
 	if err != nil {
-		return fmt.Errorf("error parsing page template: %v", err)
+		return err
 	}
 
 	// Create a file to write the processed template
@@ -58,18 +36,17 @@ func GeneratePage(baseDir, pagesDir, entityName, pluralName string, fields []Fie
 	}
 	defer file.Close()
 
-	// Define the data for the template
+	// Execute the template with the data
 	data := struct {
-		StructName string
+		EntityName string
 		PluralName string
 		Fields     []Field
 	}{
-		StructName: entityName,
+		EntityName: entityName,
 		PluralName: pluralName,
 		Fields:     fields,
 	}
 
-	// Execute the template with the data
 	if err := tmpl.Execute(file, data); err != nil {
 		return fmt.Errorf("error executing page template: %v", err)
 	}

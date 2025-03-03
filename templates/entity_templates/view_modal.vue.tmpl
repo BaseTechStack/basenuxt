@@ -1,0 +1,95 @@
+<template>
+  <UModal 
+    v-model:open="isOpen" 
+    :title="title || 'View {{.StructName}}'"
+  >
+    <template #body>
+      <div class="space-y-6">
+        {{ "{{" }} #each fields {{ "}}" }}
+          <div class="space-y-1">
+            <div class="text-sm font-medium text-gray-500">{{ "{{" }} label {{ "}}" }}</div>
+            <div>{{ "{{" }} value {{ "}}" }}</div>
+          </div>
+        {{ "{{" }} /each {{ "}}" }}
+        
+        <div class="space-y-1">
+          <div class="text-sm font-medium text-gray-500">Created</div>
+          <div>{{ "{{" }} formatDate(item.createdAt) {{ "}}" }}</div>
+        </div>
+        
+        <div class="space-y-1">
+          <div class="text-sm font-medium text-gray-500">Updated</div>
+          <div>{{ "{{" }} formatDate(item.updatedAt) {{ "}}" }}</div>
+        </div>
+      </div>
+    </template>
+    
+    <template #footer>
+      <div class="flex justify-end">
+        <UButton
+          variant="soft"
+          color="gray"
+          @click="isOpen = false"
+        >
+          Close
+        </UButton>
+      </div>
+    </template>
+  </UModal>
+</template>
+
+<script setup lang="ts">
+import { ref, computed, watch } from 'vue'
+import { formatDate } from '@/utils/dateTime'
+import { use{{.PluralName}} } from '../stores/{{.PluralName | toKebab}}Store'
+import type { {{.StructName}} } from '../stores/{{.StructName | toKebab}}'
+
+const {{.PluralName | toLower}}Store = use{{.PluralName}}()
+
+interface Props {
+  id?: string
+  title?: string
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  id: '',
+  title: ''
+})
+
+const isOpen = defineModel<boolean>('open', { default: false })
+
+const item = ref<{{.StructName}} | null>(null)
+const fields = ref<{label: string, value: any}[]>([])
+
+const populateFields = () => {
+  if (!item.value) return
+  
+  fields.value = [
+    {{range .Fields}}
+    { label: '{{.Name | ToPascal}}', value: item.value.{{.JSONName}} },
+    {{end}}
+  ]
+}
+
+const fetchData = async () => {
+  if (props.id) {
+    item.value = await {{.PluralName | toLower}}Store.get{{.StructName}}(props.id)
+    populateFields()
+  }
+}
+
+watch(isOpen, async (newVal) => {
+  if (newVal && props.id) {
+    await fetchData()
+  } else {
+    item.value = null
+    fields.value = []
+  }
+})
+
+watch(() => props.id, async (newVal) => {
+  if (isOpen.value && newVal) {
+    await fetchData()
+  }
+})
+</script>

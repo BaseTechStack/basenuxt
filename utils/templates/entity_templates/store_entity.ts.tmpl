@@ -1,8 +1,0 @@
-import type { BaseItem } from '@@/app/stores/baseStore'
-
-export interface {{.StructName}} extends BaseItem {
-{{range .Fields}}  {{.JSONName}}{{if ne .IsRequired true}}?{{end}}: {{.Type}};
-{{end}}  createdAt: string;
-  updatedAt: string;
-  // Add any additional fields as needed
-}

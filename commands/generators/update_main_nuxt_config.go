@@ -41,11 +41,11 @@ func UpdateMainNuxtConfig(baseDir string, entityDirName string) error {
 
 	// Get the content of the extends array
 	extendsContent := nuxtConfigContent[matches[2]:matches[3]]
-	
+
 	// Check if the extends array is empty or if the last entry doesn't have a comma
 	var newExtendsContent string
 	trimmedContent := strings.TrimSpace(extendsContent)
-	
+
 	if trimmedContent == "" {
 		// If extends is empty
 		newExtendsContent = fmt.Sprintf("    '%s'", entityPath)

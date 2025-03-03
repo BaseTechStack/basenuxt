@@ -4,22 +4,17 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strings"
-	"text/template"
 )
 
 // GenerateComposable generates the composable for an entity
 func GenerateComposable(baseDir, composablesDir, entityName, pluralName string, fields []Field) error {
 	// Define the output path for the composable
-	outputPath := filepath.Join(composablesDir, fmt.Sprintf("use%s.ts", pluralName))
+	outputPath := filepath.Join(composablesDir, "use"+ToPascalCase(pluralName)+".ts")
 
-	// Path to the Go template file
-	templatePath := filepath.Join(baseDir, "utils", "templates", "entity_templates", "use_entities.ts.tmpl")
-
-	// Read the template content
-	templateContent, err := os.ReadFile(templatePath)
+	// Load the template from the embedded filesystem
+	templateContent, err := loadTemplate("use_entities.ts.tmpl")
 	if err != nil {
-		return fmt.Errorf("error reading Composable template: %v", err)
+		return err
 	}
 
 	// Create the composables directory if it doesn't exist
@@ -27,41 +22,32 @@ func GenerateComposable(baseDir, composablesDir, entityName, pluralName string, 
 		return fmt.Errorf("error creating composables directory: %v", err)
 	}
 
-	// Process the template with the Go templating engine
-	tmpl, err := template.New("composable").Funcs(template.FuncMap{
-		"toLower":  strings.ToLower,
-		"toUpper":  strings.ToUpper,
-		"toPascal": ToPascalCase,
-		"toKebab":  ToKebabCase,
-		"ToPascal": ToPascalCase,
-		"ToKebab":  ToKebabCase,
-		"contains": strings.Contains,
-	}).Parse(string(templateContent))
-
+	// Create the template with common functions
+	tmpl, err := createTemplate("composable", templateContent)
 	if err != nil {
-		return fmt.Errorf("error parsing Composable template: %v", err)
+		return err
 	}
 
 	// Create a file to write the processed template
 	file, err := os.Create(outputPath)
 	if err != nil {
-		return fmt.Errorf("error creating Composable file: %v", err)
+		return fmt.Errorf("error creating composable file: %v", err)
 	}
 	defer file.Close()
 
-	// Execute the template with data passed as a struct
+	// Execute the template with the data
 	data := struct {
-		StructName string
+		EntityName string
 		PluralName string
 		Fields     []Field
 	}{
-		StructName: entityName,
+		EntityName: entityName,
 		PluralName: pluralName,
 		Fields:     fields,
 	}
 
 	if err := tmpl.Execute(file, data); err != nil {
-		return fmt.Errorf("error executing Composable template: %v", err)
+		return fmt.Errorf("error executing composable template: %v", err)
 	}
 
 	fmt.Printf("Generated %s\n", outputPath)

@@ -1,0 +1,258 @@
+<template>
+  <div class="{{.StructName | toLower}}-detail-container">
+    <header class="{{.StructName | toLower}}-detail-header p-4 flex justify-between items-center mb-6">
+      <div class="flex items-center">
+        <NuxtLink :to="`/{{.PluralName | toLower}}`" class="back-link">
+          <UButton
+            color="neutral"
+            variant="ghost"
+            icon="i-lucide-arrow-left"
+          >
+            Back to {{.PluralName}}
+          </UButton>
+        </NuxtLink>
+<h1 class="text-2xl font-bold ml-4">{{ {{.StructName | toLower}} ? {{.StructName | toLower}}.{{index .Fields 0 | .JSONName}} : 'Loading {{.StructName | toLower}}...' }}</h1>
+      </div>
+      
+      <div v-if="{{.StructName | toLower}}" class="flex items-center space-x-2">
+        <UButton
+          color="primary"
+          icon="i-heroicons-pencil-square"
+          @click="isEditing = true"
+          v-if="!isEditing"
+        >
+          Edit
+        </UButton>
+        <UButton
+          color="red"
+          icon="i-heroicons-trash"
+          @click="showDeleteConfirm = true"
+          v-if="!isEditing"
+        >
+          Delete
+        </UButton>
+        <UButton
+          color="gray"
+          @click="isEditing = false"
+          v-if="isEditing"
+        >
+          Cancel
+        </UButton>
+        <UButton
+          color="primary"
+          icon="i-heroicons-check"
+          @click="saveChanges"
+          v-if="isEditing"
+          :loading="saving"
+        >
+          Save
+        </UButton>
+      </div>
+    </header>
+
+    <div v-if="loading" class="flex flex-col items-center justify-center p-12">
+      <ULoading />
+      <p class="mt-4 text-gray-500">Loading {{.StructName | toLower}}...</p>
+    </div>
+
+    <div v-else-if="error" class="p-4">
+      <UAlert
+        title="Error"
+        color="error"
+        variant="soft"
+        icon="i-lucide-alert-triangle"
+      >
+        <template #description>
+          {{ error }}
+        </template>
+      </UAlert>
+    </div>
+
+    <div v-else-if="{{.StructName | toLower}}" class="p-4">
+      <UCard v-if="!isEditing" class="{{.StructName | toLower}}-detail">
+        <template #header>
+          <div class="{{.StructName | toLower}}-meta flex space-x-2">
+            <UBadge color="neutral" variant="soft">
+              ID: {{ {{.StructName | toLower}}.id }}
+            </UBadge>
+            <UBadge color="primary" variant="soft">
+              Created: {{ formatDate({{.StructName | toLower}}.createdAt) }}
+            </UBadge>
+            <UBadge color="primary" variant="soft">
+              Updated: {{ formatDate({{.StructName | toLower}}.updatedAt) }}
+            </UBadge>
+          </div>
+        </template>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 py-4">
+          {{range .Fields}}
+          <div>
+            <h3 class="text-sm font-medium text-gray-500">{{.JSONName | toPascal}}</h3>
+            <p class="mt-1 text-lg">{{ {{$.StructName | toLower}}.{{.JSONName}} }}</p>
+          </div>
+          {{end}}
+        </div>
+      </UCard>
+
+      <Form{{.StructName}} 
+        v-else 
+        :{{.StructName | toLower}}="{{.StructName | toLower}}" 
+        :loading="saving"
+        @submit="handleUpdate"
+      />
+    </div>
+
+    <!-- Delete Confirmation Dialog -->
+    <UModal v-model="showDeleteConfirm">
+      <UCard :ui="{ divide: 'divide-y divide-gray-100 dark:divide-gray-800' }">
+        <template #header>
+          <div class="flex items-center justify-between">
+            <h3 class="text-base font-semibold leading-6 text-gray-900 dark:text-white">
+              Delete {{.StructName}}
+            </h3>
+            <UButton
+              color="gray"
+              variant="ghost"
+              icon="i-heroicons-x-mark-20-solid"
+              class="-my-1"
+              @click="showDeleteConfirm = false"
+            />
+          </div>
+        </template>
+
+        <div class="py-4">
+          <p class="text-sm text-gray-500">
+            Are you sure you want to delete this {{.StructName | toLower}}? This action cannot be undone.
+          </p>
+        </div>
+
+        <template #footer>
+          <div class="flex justify-end gap-x-4">
+            <UButton
+              label="Cancel"
+              color="gray"
+              variant="solid"
+              @click="showDeleteConfirm = false"
+            />
+            <UButton
+              label="Delete"
+              color="red"
+              :loading="deleting"
+              @click="confirmDelete"
+            />
+          </div>
+        </template>
+      </UCard>
+    </UModal>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref, onMounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { use{{.PluralName}}Store } from '../../stores/{{.StructName | toLower}}sStore'
+import type { {{.StructName}} } from '../../stores/{{.StructName | toLower}}'
+import { format } from 'date-fns'
+
+const route = useRoute()
+const router = useRouter()
+const store = use{{.PluralName}}Store()
+
+const {{.StructName | toLower}} = ref<{{.StructName}} | null>(null)
+const loading = ref(true)
+const error = ref<string | null>(null)
+const isEditing = ref(false)
+const saving = ref(false)
+const deleting = ref(false)
+const showDeleteConfirm = ref(false)
+
+onMounted(async () => {
+  const id = route.params.id as string
+  if (!id) {
+    error.value = 'No {{.StructName | toLower}} ID provided'
+    loading.value = false
+    return
+  }
+
+  try {
+    const result = await store.fetch{{.StructName}}(id)
+    if (result) {
+      {{.StructName | toLower}}.value = result
+    } else {
+      error.value = '{{.StructName}} not found'
+    }
+  } catch (err) {
+    console.error('Error fetching {{.StructName | toLower}}:', err)
+    error.value = 'Error loading {{.StructName | toLower}}'
+  } finally {
+    loading.value = false
+  }
+})
+
+function formatDate(dateString: string) {
+  try {
+    return format(new Date(dateString), 'PPP')
+  } catch (e) {
+    return dateString
+  }
+}
+
+async function handleUpdate(data: Omit<{{.StructName}}, 'id' | 'createdAt' | 'updatedAt'>) {
+  if (!{{.StructName | toLower}}.value) return
+  
+  saving.value = true
+  try {
+    const updatedItem = await store.update{{.StructName}}({
+      id: {{.StructName | toLower}}.value.id,
+      ...data
+    })
+    
+    if (updatedItem) {
+      {{.StructName | toLower}}.value = updatedItem
+      isEditing.value = false
+    }
+  } catch (err) {
+    console.error('Error updating {{.StructName | toLower}}:', err)
+    // Show error notification
+  } finally {
+    saving.value = false
+  }
+}
+
+function saveChanges() {
+  // Form component will handle the submission
+}
+
+async function confirmDelete() {
+  if (!{{.StructName | toLower}}.value) return
+  
+  deleting.value = true
+  try {
+    await store.delete{{.StructName}}({{.StructName | toLower}}.value.id)
+    router.push('/{{.PluralName | toLower}}')
+  } catch (err) {
+    console.error('Error deleting {{.StructName | toLower}}:', err)
+    showDeleteConfirm.value = false
+  } finally {
+    deleting.value = false
+  }
+}
+</script>
+
+<style scoped>
+.{{.StructName | toLower}}-detail-container {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.{{.StructName | toLower}}-detail-header {
+  border-bottom: 1px solid var(--color-gray-200);
+}
+
+@media (prefers-color-scheme: dark) {
+  .{{.StructName | toLower}}-detail-header {
+    border-bottom: 1px solid var(--color-gray-800);
+  }
+}
+</style>
