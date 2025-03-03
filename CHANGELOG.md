@@ -5,6 +5,23 @@ All notable changes to the BaseNuxt CLI tool will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.1.2] - 2025-03-03
+
+### Added
+- Automatic dependency installation when creating new projects
+- Support for Bun, Yarn, and npm package managers (in order of preference)
+
+### Fixed
+- Fixed generator function names to follow consistent naming conventions
+- Corrected output paths for generated files
+- Updated version number in code to match release version
+
+## [v0.1.1] - 2025-03-03
+
+### Fixed
+- Fixed generator function names to follow consistent naming conventions
+- Corrected output paths for generated files
+
 ## [v0.1.0] - 2025-03-03
 
 ### Added
@@ -48,5 +65,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Fixed issue with entity generation
  
+[v0.1.2]: https://github.com/BaseTechStack/basenuxt/releases/tag/v0.1.2
+[v0.1.1]: https://github.com/BaseTechStack/basenuxt/releases/tag/v0.1.1
 [v0.1.0]: https://github.com/BaseTechStack/basenuxt/releases/tag/v0.1.0
-[v0.0.1]: https://github.com/BaseTechStack/basenuxt/releases/tag/v0.0.1
+ 
