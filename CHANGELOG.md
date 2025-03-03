@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Fixed version checking to use the correct repository URLs
 - Updated command references from 'base' to 'basenuxt' in upgrade messages
+- Fixed EditModal generator to correctly use StructName field instead of EntityName
 
 ## [v0.1.2] - 2025-03-03
 
