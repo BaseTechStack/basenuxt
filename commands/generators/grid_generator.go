@@ -6,10 +6,10 @@ import (
 	"path/filepath"
 )
 
-// GenerateGrid generates the Grid component for an entity
+// GenerateGrid generates the {EntityName}Grid component for an entity
 func GenerateGrid(baseDir, componentsDir, entityName, pluralName string, fields []Field) error {
 	// Define the output path for the component
-	outputPath := filepath.Join(componentsDir, "Grid.vue")
+	outputPath := filepath.Join(componentsDir, entityName+"Grid.vue")
 
 	// Load the template from the embedded filesystem
 	templateContent, err := loadTemplate("grid.vue.tmpl")
@@ -31,23 +31,23 @@ func GenerateGrid(baseDir, componentsDir, entityName, pluralName string, fields 
 	// Create a file to write the processed template
 	file, err := os.Create(outputPath)
 	if err != nil {
-		return fmt.Errorf("error creating Grid file: %v", err)
+		return fmt.Errorf("error creating %sGrid file: %v", entityName, err)
 	}
 	defer file.Close()
 
 	// Execute the template with the data
 	data := struct {
-		EntityName string
+		StructName string
 		PluralName string
 		Fields     []Field
 	}{
-		EntityName: entityName,
+		StructName: entityName,
 		PluralName: pluralName,
 		Fields:     fields,
 	}
 
 	if err := tmpl.Execute(file, data); err != nil {
-		return fmt.Errorf("error executing Grid template: %v", err)
+		return fmt.Errorf("error executing %sGrid template: %v", entityName, err)
 	}
 
 	fmt.Printf("Generated %s\n", outputPath)

@@ -8,19 +8,118 @@ declare global {
 }
 
 import type { {{.StructName}} } from './{{.StructName | toLower}}'
+import { defineStore } from 'pinia'
 import { defineBaseStore, type BaseItem } from '@@/app/stores/baseStore'
-import { {{.StructName | toLower}}Service } from '../services/{{.StructName | toLower}}Service'
+import { use{{.StructName}}Service } from '../services/{{.StructName | toLower}}Service'
 
 const VIEW_MODE_KEY = '{{.PluralName | toLower}}_view_mode'
 
-// Create the base {{.PluralName}} store with the {{.StructName | toLower}} service
-export const use{{.PluralName}}Store = defineBaseStore<{{.StructName}}>('{{.PluralName | toLower}}', VIEW_MODE_KEY, {{.StructName | toLower}}Service)
+// Create the {{.PluralName}} store using defineStore directly
+export const use{{.PluralName}}Store = defineStore('{{.PluralName | toLower}}', {
+  state: () => ({
+    items: [] as {{.StructName}}[],
+    loading: false,
+    error: null as string | null,
+    viewMode: (typeof window !== 'undefined' ? localStorage.getItem(VIEW_MODE_KEY) as 'grid' | 'table' : null) || 'grid',
+    pagination: {
+      total: 0,
+      page: 1,
+      pageSize: 10,
+      totalPages: 0
+    }
+  }),
+  
+  getters: {
+    getItemById: (state) => (id: number) => {
+      return state.items.find(item => item.id === id)
+    }
+  },
+  
+  actions: {
+    setViewMode(mode: 'grid' | 'table') {
+      this.viewMode = mode
+      if (typeof window !== 'undefined') {
+        localStorage.setItem(VIEW_MODE_KEY, mode)
+      }
+    },
+    
+    async fetch(page?: number, pageSize?: number) {
+      // Use the provided page or the current page from state
+      const currentPage = page !== undefined ? page : this.pagination.page
+      console.log('{{.PluralName | toLower}}Store fetch called with page:', currentPage, 'pageSize:', pageSize)
+      this.loading = true
+      try {
+        const {{.StructName | toLower}}Service = use{{.StructName}}Service()
+        const { items, pagination } = await {{.StructName | toLower}}Service.fetch(currentPage, pageSize || this.pagination.pageSize)
+        this.items = items
+        this.pagination = { ...this.pagination, ...pagination }
+        console.log('Updated pagination state:', this.pagination)
+      } catch (error: any) {
+        this.error = error.message
+      } finally {
+        this.loading = false
+      }
+    },
+    
+    async create(data: Omit<{{.StructName}}, 'id'>): Promise<{{.StructName}}> {
+      this.loading = true
+      try {
+        const {{.StructName | toLower}}Service = use{{.StructName}}Service()
+        const { item } = await {{.StructName | toLower}}Service.create(data)
+        this.items.push(item)
+        return item
+      } catch (error: any) {
+        this.error = error.message
+        throw error
+      } finally {
+        this.loading = false
+      }
+    },
+    
+    async update(id: number, data: Partial<Omit<{{.StructName}}, 'id'>>): Promise<{{.StructName}}> {
+      this.loading = true
+      try {
+        const {{.StructName | toLower}}Service = use{{.StructName}}Service()
+        const { item } = await {{.StructName | toLower}}Service.update(id, data)
+        const index = this.items.findIndex(i => i.id === id)
+        if (index !== -1) {
+          this.items[index] = item
+        }
+        return item
+      } catch (error: any) {
+        this.error = error.message
+        throw error
+      } finally {
+        this.loading = false
+      }
+    },
+    
+    async delete(id: number): Promise<void> {
+      this.loading = true
+      try {
+        const {{.StructName | toLower}}Service = use{{.StructName}}Service()
+        await {{.StructName | toLower}}Service.delete(id)
+        const index = this.items.findIndex(i => i.id === id)
+        if (index !== -1) {
+          this.items.splice(index, 1)
+        }
+      } catch (error: any) {
+        this.error = error.message
+        throw error
+      } finally {
+        this.loading = false
+      }
+    }
+  }
+})
 
 // Adding specialized methods to the store
 // Instead of extending, we'll use the store object directly
 // and add our specialized methods that call the base methods
 
 // Add these helper methods to provide more descriptive names
+// These functions should only be called from within components or other composables
+// where Pinia is properly initialized
 export function fetch{{.PluralName}}(page = 1, pageSize?: number): Promise<void> {
   console.log('fetch{{.PluralName}} called with page:', page, 'pageSize:', pageSize)
   const store = use{{.PluralName}}Store()

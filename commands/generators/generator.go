@@ -9,7 +9,7 @@ import (
 // Generator holds configuration for the entity generation process
 type Generator struct {
 	BaseDir    string
-	EntityName string
+	StructName string
 	PluralName string
 	Fields     []Field
 }
@@ -21,7 +21,7 @@ func NewGenerator(baseDir, entityName string, fieldStrs []string) *Generator {
 
 	return &Generator{
 		BaseDir:    baseDir,
-		EntityName: entityName,
+		StructName: entityName,
 		PluralName: pluralName,
 		Fields:     fields,
 	}
@@ -56,60 +56,64 @@ func (g *Generator) Generate() error {
 		}
 	}
 
-	fmt.Printf("Generating entity files for %s in %s\n", g.EntityName, entityDir)
+	fmt.Printf("Generating entity files for %s in %s\n", g.StructName, entityDir)
 
 	// Generate TypeScript interface
-	if err := GenerateEntityType(g.BaseDir, storesDir, g.EntityName, g.PluralName, g.Fields); err != nil {
+	if err := GenerateEntityType(g.BaseDir, storesDir, g.StructName, g.PluralName, g.Fields); err != nil {
 		return fmt.Errorf("error generating entity type: %v", err)
 	}
 
 	// Generate Entity Store
-	if err := GenerateEntityStore(g.BaseDir, storesDir, g.EntityName, g.PluralName, g.Fields); err != nil {
+	if err := GenerateEntityStore(g.BaseDir, storesDir, g.StructName, g.PluralName, g.Fields); err != nil {
 		return fmt.Errorf("error generating entity store: %v", err)
 	}
 
 	// Generate Vue components
-	if err := GenerateAddModal(g.BaseDir, componentsDir, g.EntityName, g.PluralName, g.Fields); err != nil {
-		return fmt.Errorf("error generating AddModal: %v", err)
+	if err := GenerateAddModal(g.BaseDir, componentsDir, g.StructName, g.PluralName, g.Fields); err != nil {
+		return fmt.Errorf("error generating Add%sModal: %v", g.StructName, err)
 	}
 
-	if err := GenerateEditModal(g.BaseDir, componentsDir, g.EntityName, g.PluralName, g.Fields); err != nil {
-		return fmt.Errorf("error generating EditModal: %v", err)
+	if err := GenerateEditModal(g.BaseDir, componentsDir, g.StructName, g.PluralName, g.Fields); err != nil {
+		return fmt.Errorf("error generating Edit%sModal: %v", g.StructName, err)
 	}
 
-	if err := GenerateViewModal(g.BaseDir, componentsDir, g.EntityName, g.PluralName, g.Fields); err != nil {
-		return fmt.Errorf("error generating ViewModal: %v", err)
+	if err := GenerateViewModal(g.BaseDir, componentsDir, g.StructName, g.PluralName, g.Fields); err != nil {
+		return fmt.Errorf("error generating View%sModal: %v", g.StructName, err)
 	}
 
-	if err := GenerateGrid(g.BaseDir, componentsDir, g.EntityName, g.PluralName, g.Fields); err != nil {
-		return fmt.Errorf("error generating Grid: %v", err)
+	if err := GenerateDeleteModal(g.BaseDir, componentsDir, g.StructName, g.PluralName, g.Fields); err != nil {
+		return fmt.Errorf("error generating Delete%sModal: %v", g.StructName, err)
 	}
 
-	if err := GenerateGridCard(g.BaseDir, componentsDir, g.EntityName, g.PluralName, g.Fields); err != nil {
-		return fmt.Errorf("error generating GridCard: %v", err)
+	if err := GenerateGrid(g.BaseDir, componentsDir, g.StructName, g.PluralName, g.Fields); err != nil {
+		return fmt.Errorf("error generating %sGrid: %v", g.StructName, err)
 	}
 
-	if err := GenerateTable(g.BaseDir, componentsDir, g.EntityName, g.PluralName, g.Fields); err != nil {
-		return fmt.Errorf("error generating Table: %v", err)
+	if err := GenerateGridCard(g.BaseDir, componentsDir, g.StructName, g.PluralName, g.Fields); err != nil {
+		return fmt.Errorf("error generating %sGridCard: %v", g.StructName, err)
+	}
+
+	if err := GenerateTable(g.BaseDir, componentsDir, g.StructName, g.PluralName, g.Fields); err != nil {
+		return fmt.Errorf("error generating %sTable: %v", g.StructName, err)
 	}
 
 	// Generate Composable
-	if err := GenerateComposable(g.BaseDir, composablesDir, g.EntityName, g.PluralName, g.Fields); err != nil {
+	if err := GenerateComposable(g.BaseDir, composablesDir, g.StructName, g.PluralName, g.Fields); err != nil {
 		return fmt.Errorf("error generating Composable: %v", err)
 	}
 
 	// Generate Service
-	if err := GenerateService(g.BaseDir, servicesDir, g.EntityName, g.PluralName, g.Fields); err != nil {
+	if err := GenerateService(g.BaseDir, servicesDir, g.StructName, g.PluralName, g.Fields); err != nil {
 		return fmt.Errorf("error generating Service: %v", err)
 	}
 
 	// Generate Page
-	if err := GeneratePage(g.BaseDir, pagesDir, g.EntityName, g.PluralName, g.Fields); err != nil {
+	if err := GeneratePage(g.BaseDir, pagesDir, g.StructName, g.PluralName, g.Fields); err != nil {
 		return fmt.Errorf("error generating Page: %v", err)
 	}
 
 	// Generate nuxt.config.ts
-	if err := GenerateNuxtConfig(g.BaseDir, entityDir, g.EntityName, g.PluralName, g.Fields); err != nil {
+	if err := GenerateNuxtConfig(g.BaseDir, entityDir, g.StructName, g.PluralName, g.Fields); err != nil {
 		return fmt.Errorf("error generating nuxt.config.ts: %v", err)
 	}
 
@@ -118,6 +122,12 @@ func (g *Generator) Generate() error {
 		return fmt.Errorf("error updating main nuxt.config.ts: %v", err)
 	}
 
-	fmt.Printf("Entity generation completed successfully for %s\n", g.EntityName)
+	// Update the sidebar to include a link to the new entity
+	if err := UpdateSidebar(g.BaseDir, g.StructName, g.PluralName); err != nil {
+		// Just log the error but don't fail the generation process
+		fmt.Printf("Warning: could not update sidebar: %v\n", err)
+	}
+
+	fmt.Printf("Entity generation completed successfully for %s\n", g.StructName)
 	return nil
 }

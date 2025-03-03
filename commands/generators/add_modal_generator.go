@@ -6,10 +6,10 @@ import (
 	"path/filepath"
 )
 
-// GenerateAddModal generates the AddModal.vue component for an entity
+// GenerateAddModal generates the Add{EntityName}Modal.vue component for an entity
 func GenerateAddModal(baseDir, componentsDir, entityName, pluralName string, fields []Field) error {
 	// Define the output path for the component
-	outputPath := filepath.Join(componentsDir, "AddModal.vue")
+	outputPath := filepath.Join(componentsDir, "Add"+entityName+"Modal.vue")
 
 	// Load the template from the embedded filesystem
 	templateContent, err := loadTemplate("add_modal.vue.tmpl")
@@ -31,7 +31,7 @@ func GenerateAddModal(baseDir, componentsDir, entityName, pluralName string, fie
 	// Create a file to write the processed template
 	file, err := os.Create(outputPath)
 	if err != nil {
-		return fmt.Errorf("error creating AddModal file: %v", err)
+		return fmt.Errorf("error creating Add%sModal file: %v", entityName, err)
 	}
 	defer file.Close()
 

@@ -6,10 +6,10 @@ import (
 	"path/filepath"
 )
 
-// GenerateViewModal generates the ViewModal component for an entity
+// GenerateViewModal generates the View{EntityName}Modal component for an entity
 func GenerateViewModal(baseDir, componentsDir, entityName, pluralName string, fields []Field) error {
 	// Define the output path for the component
-	outputPath := filepath.Join(componentsDir, "ViewModal.vue")
+	outputPath := filepath.Join(componentsDir, "View"+entityName+"Modal.vue")
 
 	// Load the template from the embedded filesystem
 	templateContent, err := loadTemplate("view_modal.vue.tmpl")
@@ -31,23 +31,23 @@ func GenerateViewModal(baseDir, componentsDir, entityName, pluralName string, fi
 	// Create a file to write the processed template
 	file, err := os.Create(outputPath)
 	if err != nil {
-		return fmt.Errorf("error creating ViewModal file: %v", err)
+		return fmt.Errorf("error creating View%sModal file: %v", entityName, err)
 	}
 	defer file.Close()
 
 	// Execute the template with the data
 	data := struct {
-		EntityName string
+		StructName string
 		PluralName string
 		Fields     []Field
 	}{
-		EntityName: entityName,
+		StructName: entityName,
 		PluralName: pluralName,
 		Fields:     fields,
 	}
 
 	if err := tmpl.Execute(file, data); err != nil {
-		return fmt.Errorf("error executing ViewModal template: %v", err)
+		return fmt.Errorf("error executing View%sModal template: %v", entityName, err)
 	}
 
 	fmt.Printf("Generated %s\n", outputPath)

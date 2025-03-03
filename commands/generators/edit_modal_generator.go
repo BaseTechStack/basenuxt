@@ -6,10 +6,10 @@ import (
 	"path/filepath"
 )
 
-// GenerateEditModal generates the EditModal component for an entity
+// GenerateEditModal generates the Edit{EntityName}Modal component for an entity
 func GenerateEditModal(baseDir, componentsDir, entityName, pluralName string, fields []Field) error {
 	// Define the output path for the component
-	outputPath := filepath.Join(componentsDir, "EditModal.vue")
+	outputPath := filepath.Join(componentsDir, "Edit"+entityName+"Modal.vue")
 
 	// Load the template from the embedded filesystem
 	templateContent, err := loadTemplate("edit_modal.vue.tmpl")
@@ -31,7 +31,7 @@ func GenerateEditModal(baseDir, componentsDir, entityName, pluralName string, fi
 	// Create a file to write the processed template
 	file, err := os.Create(outputPath)
 	if err != nil {
-		return fmt.Errorf("error creating EditModal file: %v", err)
+		return fmt.Errorf("error creating Edit%sModal file: %v", entityName, err)
 	}
 	defer file.Close()
 
@@ -47,7 +47,7 @@ func GenerateEditModal(baseDir, componentsDir, entityName, pluralName string, fi
 	}
 
 	if err := tmpl.Execute(file, data); err != nil {
-		return fmt.Errorf("error executing EditModal template: %v", err)
+		return fmt.Errorf("error executing Edit%sModal template: %v", entityName, err)
 	}
 
 	fmt.Printf("Generated %s\n", outputPath)

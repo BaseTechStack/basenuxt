@@ -50,18 +50,18 @@
         />
       </div>
       <!-- Page Content -->
-      <Grid 
-        v-if="store.viewMode === 'grid' && store.{{.StructName | toLower}}s.length > 0" 
-        :{{.StructName | toLower}}s="store.{{.StructName | toLower}}s" 
+      <{{.StructName}}Grid 
+        v-if="store.viewMode === 'grid' && store.items.length > 0" 
+        :{{.StructName | toLower}}="store.items" 
         @edit="edit{{.StructName}}" 
         @delete="delete{{.StructName}}" 
         @view="view{{.StructName}}"
         :current-page="store.pagination.page"
         :page-size="store.pagination.pageSize"
       />
-      <Table 
-        v-else-if="store.viewMode === 'table' && store.{{.StructName | toLower}}s.length > 0"
-        :{{.StructName | toLower}}s="store.{{.StructName | toLower}}s" 
+      <{{.StructName}}Table 
+        v-else-if="store.viewMode === 'table' && store.items.length > 0"
+        :{{.StructName | toLower}}="store.items" 
         @edit="edit{{.StructName}}" 
         @delete="delete{{.StructName}}" 
         @view="view{{.StructName}}"
@@ -70,8 +70,7 @@
       />
 
       <!-- Empty State -->
-      <div v-if="store.{{.StructName | toLower}}s.length === 0" class="text-center py-12">
-        <UIllustration name="empty" class="mx-auto h-40 w-40 text-gray-300" />
+      <div v-if="store.items.length === 0" class="text-center py-12">
         <h3 class="mt-4 text-lg font-medium text-gray-900">No {{.PluralName}}</h3>
         <p class="mt-1 text-sm text-gray-500">Get started by creating a new {{.StructName | toLower}}.</p>
         <div class="mt-6">
@@ -83,28 +82,36 @@
     </div>
 
     <!-- Modals -->
-    <AddModal{{.StructName}} 
+    <Add{{.StructName}}Modal
       v-model="modalState.add.isOpen" 
       @{{.StructName | toLower}}-added="handle{{.StructName}}Added"
     />
     
-    <EditModal{{.StructName}} 
-      v-model="modalState.edit.isOpen" 
+    <Edit{{.StructName}}Modal
+      v-model:open="modalState.edit.isOpen" 
       :{{.StructName | toLower}}="modalState.edit.{{.StructName | toLower}}"
-      @{{.StructName | toLower}}-updated="handle{{.StructName}}Updated"
+      :loading="modalState.edit.loading"
+      @submit="handleEditSubmit"
     />
     
-    <ViewModal{{.StructName}} 
-      v-model="modalState.view.isOpen" 
+    <View{{.StructName}}Modal
+      v-model:open="modalState.view.isOpen" 
       :{{.StructName | toLower}}="modalState.view.{{.StructName | toLower}}"
-    /> 
+    />
+    
+    <Delete{{.StructName}}Modal
+      v-model:open="modalState.delete.isOpen" 
+      :{{.StructName | toLower}}="modalState.delete.{{.StructName | toLower}}"
+      :loading="modalState.delete.loading"
+      @confirm="confirmDelete"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
-import { use{{.PluralName}}Store } from '../stores/{{.StructName | toLower}}sStore'
-import type { {{.StructName}} } from '../stores/{{.StructName | toLower}}'
+import { use{{.PluralName}}Store } from '../../stores/{{.PluralName | toLower}}Store'
+import type { {{.StructName}} } from '../../stores/{{.StructName | toLower}}'
 import { format } from 'date-fns'
 
 interface ModalState {
@@ -137,17 +144,9 @@ const modalState = ref<ModalState>({
   delete: { isOpen: false }
 })
 
-const columns = [
-  { key: 'id', label: 'ID' },
-  {{range .Fields}}
-  { key: '{{.JSONName}}', label: '{{.JSONName | toPascal}}' },
-  {{end}}
-  { key: 'createdAt', label: 'Created' },
-  { key: 'actions', label: 'Actions' }
-]
 
 onMounted(async () => {
-  await store.fetch{{.PluralName}}()
+  await store.fetch()
 })
 
 function formatDate(dateString: string) {
@@ -189,20 +188,21 @@ function closeModal(type: 'add' | 'edit' | 'view') {
 }
 
 function handlePageChange(page: number) {
+  console.log('handlePageChange called with page:', page)
   store.pagination.page = page
-  store.fetch{{.PluralName}}()
+  store.fetch(page) // Explicitly pass the page parameter
 }
 
 function handlePageSizeChange(size: number) {
   store.pagination.pageSize = size
   store.pagination.page = 1
-  store.fetch{{.PluralName}}()
+  store.fetch()
 }
 
-async function handle{{.StructName}}Added(data: Omit<{{.StructName}}, 'id' | 'createdAt' | 'updatedAt'>) {
+async function handle{{.StructName}}Added(data: Omit<{{.StructName}}, 'id'>) {
   modalState.value.add.loading = true
   try {
-    await store.create{{.StructName}}(data)
+    await store.create(data)
     modalState.value.add.isOpen = false
   } catch (error) {
     console.error('Error adding {{.StructName | toLower}}:', error)
@@ -211,15 +211,10 @@ async function handle{{.StructName}}Added(data: Omit<{{.StructName}}, 'id' | 'cr
   }
 }
 
-async function handle{{.StructName}}Updated(data: Omit<{{.StructName}}, 'id' | 'createdAt' | 'updatedAt'>) {
-  if (!modalState.value.edit.{{.StructName | toLower}}) return
-  
+async function handleEditSubmit(id: number, data: Partial<{{.StructName}}>) {
   modalState.value.edit.loading = true
   try {
-    await store.update{{.StructName}}({
-      id: modalState.value.edit.{{.StructName | toLower}}.id,
-      ...data
-    })
+    await store.update(id, data)
     modalState.value.edit.isOpen = false
   } catch (error) {
     console.error('Error updating {{.StructName | toLower}}:', error)
@@ -233,7 +228,7 @@ async function confirmDelete() {
   
   modalState.value.delete.loading = true
   try {
-    await store.delete{{.StructName}}(modalState.value.delete.{{.StructName | toLower}}.id)
+    await store.delete(modalState.value.delete.{{.StructName | toLower}}.id)
     modalState.value.delete.isOpen = false
   } catch (error) {
     console.error('Error deleting {{.StructName | toLower}}:', error)

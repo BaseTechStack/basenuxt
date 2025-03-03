@@ -5,6 +5,29 @@ All notable changes to the BaseNuxt CLI tool will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.1.6] - 2025-03-03
+
+### Added
+- Added DeleteModal generator to create entity-specific delete modal components
+- Updated templates to use entity-specific naming conventions for all components
+- Improved UI for modal components with consistent styling
+
+### Changed
+- Modified delete_modal.vue.tmpl to use a red-themed UI for better user experience
+- Updated view_modal.vue.tmpl to include title and description properties
+
+## [v0.1.5] - 2025-03-03
+
+### Fixed
+- Fixed ViewModal generator to correctly use StructName field instead of EntityName
+- Fixed Grid and GridCard generators to use StructName field instead of EntityName
+- Updated all generator functions to consistently use StructName throughout the codebase
+
+## [v0.1.4] - 2025-03-03
+
+### Fixed
+- Fixed EditModal generator to correctly use StructName field instead of EntityName
+
 ## [v0.1.3] - 2025-03-03
 
 ### Fixed
@@ -72,6 +95,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Fixed issue with entity generation
  
+[v0.1.4]: https://github.com/BaseTechStack/basenuxt/releases/tag/v0.1.4
 [v0.1.3]: https://github.com/BaseTechStack/basenuxt/releases/tag/v0.1.3
 [v0.1.2]: https://github.com/BaseTechStack/basenuxt/releases/tag/v0.1.2
 [v0.1.1]: https://github.com/BaseTechStack/basenuxt/releases/tag/v0.1.1

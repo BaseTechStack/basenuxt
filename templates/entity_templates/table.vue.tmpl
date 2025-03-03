@@ -15,18 +15,18 @@
         />
       </div>
       
-      <UTable :data="{{.StructName | toLower}}s" :columns="columns" />
+      <UTable :data="{{.PluralName | toLower}}" :columns="columns" />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import type { {{.StructName}} } from '../stores/{{.StructName | toLower}}'
-import { ref, h, resolveComponent } from 'vue'
+import { ref, h, resolveComponent, computed } from 'vue'
 import type { TableColumn } from '@nuxt/ui'
 
 interface Props {
-  {{.StructName | toLower}}s: {{.StructName}}[]
+  {{.StructName | toLower}}: {{.StructName}}[]
   loading?: boolean
   error?: string | null
 }
@@ -39,33 +39,30 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{
   (e: 'edit', {{.StructName | toLower}}: {{.StructName}}): void
   (e: 'delete', {{.StructName | toLower}}: {{.StructName}}): void
+  (e: 'view', {{.StructName | toLower}}: {{.StructName}}): void
 }>()
 
 const search = ref('')
 
+const {{.PluralName | toLower}} = computed(() => props.{{.StructName | toLower}})
+
 const columns: TableColumn<{{.StructName}}>[] = [
   {
-    key: 'id',
-    label: 'ID',
-    sortable: true
+    accessorKey: 'id',
+    header: 'ID'
   },
   {{range .Fields}}
   {
-    key: '{{.JSONName}}',
-    label: '{{.JSONName | toPascal}}',
-    sortable: true
+    accessorKey: '{{.JSONName}}',
+    header: '{{.JSONName | toPascal}}'
   },
   {{end}}
   {
-    key: 'createdAt',
-    label: 'Created',
-    sortable: true
+    accessorKey: 'createdAt',
+    header: 'Created'
   },
   {
-    key: 'actions',
-    label: 'Actions',
-    sortable: false,
-    class: 'w-24',
+    accessorKey: 'actions',
     header: () => h('div', { class: 'text-right' }, 'Actions'),
     cell: ({ row }) => h('div', { class: 'flex justify-end gap-2' }, [
       h(resolveComponent('UButton'), {
@@ -73,21 +70,21 @@ const columns: TableColumn<{{.StructName}}>[] = [
         variant: 'ghost',
         icon: 'i-heroicons-eye',
         size: 'xs',
-        onClick: () => navigateTo(`/{{.PluralName | toLower}}/${row.id}`)
+        onClick: () => emit('view', row as unknown as {{.StructName}})
       }),
       h(resolveComponent('UButton'), {
         color: 'primary',
         variant: 'ghost',
         icon: 'i-heroicons-pencil-square',
         size: 'xs',
-        onClick: () => emit('edit', row)
+        onClick: () => emit('edit', row as unknown as {{.StructName}})
       }),
       h(resolveComponent('UButton'), {
         color: 'red',
         variant: 'ghost',
         icon: 'i-heroicons-trash',
         size: 'xs',
-        onClick: () => emit('delete', row)
+        onClick: () => emit('delete', row as unknown as {{.StructName}})
       })
     ])
   }

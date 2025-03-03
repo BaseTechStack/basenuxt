@@ -1,5 +1,5 @@
-export interface {{.StructName}} {
-  id: string;
+import type { BaseItem } from '@@/app/stores/baseStore'
+export interface {{.StructName}} extends BaseItem {
 {{range .Fields}}  {{.JSONName}}{{if not .IsRequired}}?{{end}}: {{.Type}};
 {{end}}  createdAt: string;
   updatedAt: string;

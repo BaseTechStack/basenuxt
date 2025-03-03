@@ -1,62 +1,86 @@
 <template>
-  <UModal 
-    v-model:open="isOpen" 
-    :title="title || 'View {{.StructName}}'"
+  <USlideover
+    v-model:open="isOpen"
+    title="View {{.StructName}}"
+    description="View the details of this {{.StructName}}."
   >
-    <template #body>
-      <div class="space-y-6">
-        {{ "{{" }} #each fields {{ "}}" }}
-          <div class="space-y-1">
-            <div class="text-sm font-medium text-gray-500">{{ "{{" }} label {{ "}}" }}</div>
-            <div>{{ "{{" }} value {{ "}}" }}</div>
-          </div>
-        {{ "{{" }} /each {{ "}}" }}
+    <template #header>
+      <div class="flex items-center justify-between">
+        <h3 class="text-base font-semibold leading-6 text-gray-900 dark:text-white">
+          View {{.StructName}}
+        </h3>
+      </div>
+    </template>
+    <template #content>
+      <div class="space-y-6 p-4">
+        <div v-for="field in fields" :key="field.label" class="space-y-1">
+          <div class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ "{{" }} field.label {{ "}}" }}</div>
+          <div>{{ "{{" }} field.value {{ "}}" }}</div>
+        </div>
         
-        <div class="space-y-1">
-          <div class="text-sm font-medium text-gray-500">Created</div>
+        <div v-if="item" class="space-y-1">
+          <div class="text-sm font-medium text-gray-500 dark:text-gray-400">Created</div>
           <div>{{ "{{" }} formatDate(item.createdAt) {{ "}}" }}</div>
         </div>
         
-        <div class="space-y-1">
-          <div class="text-sm font-medium text-gray-500">Updated</div>
+        <div v-if="item" class="space-y-1">
+          <div class="text-sm font-medium text-gray-500 dark:text-gray-400">Updated</div>
           <div>{{ "{{" }} formatDate(item.updatedAt) {{ "}}" }}</div>
         </div>
       </div>
     </template>
     
     <template #footer>
-      <div class="flex justify-end">
+      <div class="flex justify-end p-4">
         <UButton
           variant="soft"
-          color="gray"
+          color="neutral"
           @click="isOpen = false"
         >
           Close
         </UButton>
       </div>
     </template>
-  </UModal>
+  </USlideover>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
-import { formatDate } from '@/utils/dateTime'
-import { use{{.PluralName}} } from '../stores/{{.PluralName | toKebab}}Store'
-import type { {{.StructName}} } from '../stores/{{.StructName | toKebab}}'
+import { format } from 'date-fns'
+import { use{{.PluralName}}Store } from '../stores/{{.PluralName | toLower}}Store'
+import type { {{.StructName}} } from '../stores/{{.StructName | toLower}}'
 
-const {{.PluralName | toLower}}Store = use{{.PluralName}}()
-
-interface Props {
-  id?: string
-  title?: string
+const formatDate = (dateString: string) => {
+  try {
+    return format(new Date(dateString), 'PPP')
+  } catch (e) {
+    return dateString
+  }
 }
 
-const props = withDefaults(defineProps<Props>(), {
-  id: '',
-  title: ''
+const {{.PluralName | toLower}}Store = use{{.PluralName}}Store()
+
+const props = defineProps<{
+  open?: boolean
+  {{.StructName | toLower}}?: {{.StructName}}
+  title?: string
+}>()
+
+const emit = defineEmits<{
+  (e: 'update:open', value: boolean): void
+}>()
+
+// Create a computed property for v-model binding with USlideover
+const isOpen = computed({
+  get() {
+    return props.open
+  },
+  set(value) {
+    emit('update:open', value)
+  }
 })
 
-const isOpen = defineModel<boolean>('open', { default: false })
+// No need for a computed title as we're using a hardcoded one
 
 const item = ref<{{.StructName}} | null>(null)
 const fields = ref<{label: string, value: any}[]>([])
@@ -71,25 +95,25 @@ const populateFields = () => {
   ]
 }
 
-const fetchData = async () => {
-  if (props.id) {
-    item.value = await {{.PluralName | toLower}}Store.get{{.StructName}}(props.id)
+const fetchData = () => {
+  if (props.{{.StructName | toLower}}) {
+    item.value = props.{{.StructName | toLower}}
     populateFields()
   }
 }
 
-watch(isOpen, async (newVal) => {
-  if (newVal && props.id) {
-    await fetchData()
+watch(isOpen, (newVal) => {
+  if (newVal && props.{{.StructName | toLower}}) {
+    fetchData()
   } else {
     item.value = null
     fields.value = []
   }
 })
 
-watch(() => props.id, async (newVal) => {
+watch(() => props.{{.StructName | toLower}}, (newVal) => {
   if (isOpen.value && newVal) {
-    await fetchData()
+    fetchData()
   }
 })
 </script>

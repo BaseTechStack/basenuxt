@@ -86,6 +86,25 @@ func createNewProject(cmd *cobra.Command, args []string) {
 	// Clean up the temporary directory
 	os.RemoveAll(filepath.Join(projectName, "basenuxt-source-main"))
 
+	// Update package.json with the correct project name
+	packageJSONPath := filepath.Join(projectName, "package.json")
+	if _, err := os.Stat(packageJSONPath); err == nil {
+		// Read the package.json file
+		packageJSON, err := os.ReadFile(packageJSONPath)
+		if err != nil {
+			fmt.Printf("Error reading package.json: %v\n", err)
+		} else {
+			// Replace the name field with the project name
+			updatedJSON := utils.ReplaceJSONField(string(packageJSON), "name", "\""+projectName+"\"")
+			
+			// Write the updated package.json file
+			err = os.WriteFile(packageJSONPath, []byte(updatedJSON), 0644)
+			if err != nil {
+				fmt.Printf("Error updating package.json: %v\n", err)
+			}
+		}
+	}
+
 	// Get the absolute path of the new project directory
 	absPath, err := filepath.Abs(projectName)
 	if err != nil {

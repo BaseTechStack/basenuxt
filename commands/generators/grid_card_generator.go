@@ -6,10 +6,10 @@ import (
 	"path/filepath"
 )
 
-// GenerateGridCard generates the GridCard component for an entity
+// GenerateGridCard generates the {EntityName}GridCard component for an entity
 func GenerateGridCard(baseDir, componentsDir, entityName, pluralName string, fields []Field) error {
 	// Define the output path for the component
-	outputPath := filepath.Join(componentsDir, "GridCard.vue")
+	outputPath := filepath.Join(componentsDir, entityName+"GridCard.vue")
 
 	// Load the template from the embedded filesystem
 	templateContent, err := loadTemplate("grid_card.vue.tmpl")
@@ -31,23 +31,23 @@ func GenerateGridCard(baseDir, componentsDir, entityName, pluralName string, fie
 	// Create a file to write the processed template
 	file, err := os.Create(outputPath)
 	if err != nil {
-		return fmt.Errorf("error creating GridCard file: %v", err)
+		return fmt.Errorf("error creating %sGridCard file: %v", entityName, err)
 	}
 	defer file.Close()
 
 	// Execute the template with the data
 	data := struct {
-		EntityName string
+		StructName string
 		PluralName string
 		Fields     []Field
 	}{
-		EntityName: entityName,
+		StructName: entityName,
 		PluralName: pluralName,
 		Fields:     fields,
 	}
 
 	if err := tmpl.Execute(file, data); err != nil {
-		return fmt.Errorf("error executing GridCard template: %v", err)
+		return fmt.Errorf("error executing %sGridCard template: %v", entityName, err)
 	}
 
 	fmt.Printf("Generated %s\n", outputPath)

@@ -38,11 +38,11 @@ func GeneratePage(baseDir, pagesDir, entityName, pluralName string, fields []Fie
 
 	// Execute the template with the data
 	data := struct {
-		EntityName string
+		StructName string
 		PluralName string
 		Fields     []Field
 	}{
-		EntityName: entityName,
+		StructName: entityName,
 		PluralName: pluralName,
 		Fields:     fields,
 	}

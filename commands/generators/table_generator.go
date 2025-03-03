@@ -6,10 +6,10 @@ import (
 	"path/filepath"
 )
 
-// GenerateTable generates the Table component for an entity
+// GenerateTable generates the {EntityName}Table component for an entity
 func GenerateTable(baseDir, componentsDir, entityName, pluralName string, fields []Field) error {
 	// Define the output path for the component
-	outputPath := filepath.Join(componentsDir, "Table.vue")
+	outputPath := filepath.Join(componentsDir, entityName+"Table.vue")
 
 	// Load the template from the embedded filesystem
 	templateContent, err := loadTemplate("table.vue.tmpl")
@@ -31,23 +31,23 @@ func GenerateTable(baseDir, componentsDir, entityName, pluralName string, fields
 	// Create a file to write the processed template
 	file, err := os.Create(outputPath)
 	if err != nil {
-		return fmt.Errorf("error creating Table file: %v", err)
+		return fmt.Errorf("error creating %sTable file: %v", entityName, err)
 	}
 	defer file.Close()
 
 	// Execute the template with the data
 	data := struct {
-		EntityName string
+		StructName string
 		PluralName string
 		Fields     []Field
 	}{
-		EntityName: entityName,
+		StructName: entityName,
 		PluralName: pluralName,
 		Fields:     fields,
 	}
 
 	if err := tmpl.Execute(file, data); err != nil {
-		return fmt.Errorf("error executing Table template: %v", err)
+		return fmt.Errorf("error executing %sTable template: %v", entityName, err)
 	}
 
 	fmt.Printf("Generated %s\n", outputPath)
