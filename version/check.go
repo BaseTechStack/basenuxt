@@ -11,7 +11,7 @@ import (
 
 const (
 	// VersionCheckURL is the URL to check for latest commit
-	VersionCheckURL = "https://api.github.com/repos/base-go/cmd/commits/main"
+	VersionCheckURL = "https://api.github.com/repos/BaseTechStack/basenuxt/commits/main"
 )
 
 // CommitInfo represents the GitHub commit response
@@ -36,7 +36,7 @@ type GithubRelease struct {
 
 // CheckForUpdates checks GitHub for newer releases
 func CheckForUpdates() (latestVersion, releaseURL, releaseNotes string, hasUpdate bool, err error) {
-	url := "https://api.github.com/repos/base-go/cmd/releases/latest"
+	url := "https://api.github.com/repos/BaseTechStack/basenuxt/releases/latest"
 	resp, err := http.Get(url)
 	if err != nil {
 		return "", "", "", false, err
@@ -102,7 +102,7 @@ func PrintUpdateMessage() {
 	}
 
 	fmt.Printf("\n📦 Update available! %s → %s\n", currentVersion, latestVersion)
-	fmt.Printf("Run: base upgrade\n")
+	fmt.Printf("Run: basenuxt upgrade\n")
 	fmt.Printf("Release notes: %s\n", releaseURL)
 	if releaseNotes != "" {
 		fmt.Printf("\nChangelog:\n%s\n", releaseNotes)
