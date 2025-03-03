@@ -16,6 +16,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Modified delete_modal.vue.tmpl to use a red-themed UI for better user experience
 - Updated view_modal.vue.tmpl to include title and description properties
 
+### Fixed
+- Fixed ViewModal generator to correctly pass StructName to the template
+
 ## [v0.1.5] - 2025-03-03
 
 ### Fixed
@@ -95,6 +98,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Fixed issue with entity generation
  
+[v0.1.6]: https://github.com/BaseTechStack/basenuxt/releases/tag/v0.1.6
+[v0.1.5]: https://github.com/BaseTechStack/basenuxt/releases/tag/v0.1.5
 [v0.1.4]: https://github.com/BaseTechStack/basenuxt/releases/tag/v0.1.4
 [v0.1.3]: https://github.com/BaseTechStack/basenuxt/releases/tag/v0.1.3
 [v0.1.2]: https://github.com/BaseTechStack/basenuxt/releases/tag/v0.1.2
