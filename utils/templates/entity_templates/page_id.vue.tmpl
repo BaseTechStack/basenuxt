@@ -11,7 +11,7 @@
             Back to {{.PluralName}}
           </UButton>
         </NuxtLink>
-        <h1 class="text-2xl font-bold ml-4">{{ '{{' }} {{.StructName | toLower}} ? {{.StructName | toLower}}.{{index .Fields 0 | .JSONName}} : 'Loading {{.StructName | toLower}}...' {{ '}}' }}</h1>
+<h1 class="text-2xl font-bold ml-4">{{ {{.StructName | toLower}} ? {{.StructName | toLower}}.{{index .Fields 0 | .JSONName}} : 'Loading {{.StructName | toLower}}...' }}</h1>
       </div>
       
       <div v-if="{{.StructName | toLower}}" class="flex items-center space-x-2">

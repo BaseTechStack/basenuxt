@@ -181,7 +181,7 @@ func runWithSudo(command string, args ...string) error {
 
 var upgradeCmd = &cobra.Command{
 	Use:   "upgrade",
-	Short: "Upgrade Base CLI to the latest version",
+	Short: "Upgrade BaseNuxt CLI to the latest version",
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("Checking for updates...")
 

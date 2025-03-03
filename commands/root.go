@@ -13,7 +13,7 @@ var rootCmd = &cobra.Command{
 	Use:   "basenuxt",
 	Short: "BaseNuxt CLI - A modern Nuxt scaffolding framework",
 	Long: `BaseNuxt CLI is a powerful tool for building modern Nuxt applications.
-It provides scaffolding, code generation, and development utilities. Works best with the Base framework.`,
+It provides scaffolding, code generation, and development utilities. Works best with the BaseNuxt framework.`,
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
 		// Skip version check for version and upgrade commands
 		if cmd.Name() != "version" && cmd.Name() != "upgrade" {

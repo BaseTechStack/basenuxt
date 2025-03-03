@@ -21,7 +21,7 @@ function Ensure-Directory {
     }
 }
 
-Write-Host "Installing Base CLI..." -ForegroundColor Green
+Write-Host "Installing BaseNuxt CLI..." -ForegroundColor Green
 
 # Detect architecture
 $arch = if ([Environment]::Is64BitOperatingSystem) { "amd64" } else { "386" }
@@ -40,10 +40,10 @@ $version = Get-LatestRelease
 Write-Host "Latest version: $version"
 
 # Download URL
-$downloadUrl = "https://github.com/BaseTechStack/basenuxt/releases/download/$version/base_windows_$arch.zip"
-$zipPath = Join-Path $env:TEMP "base.zip"
-$exePath = Join-Path $installDir "base.exe"
-$binPath = Join-Path $binDir "base.exe"
+$downloadUrl = "https://github.com/BaseTechStack/basenuxt/releases/download/$version/basenuxt_windows_$arch.zip"
+$zipPath = Join-Path $env:TEMP "basenuxt.zip"
+$exePath = Join-Path $installDir "basenuxt.exe"
+$binPath = Join-Path $binDir "basenuxt.exe"
 
 Write-Host "Downloading from: $downloadUrl"
 
@@ -65,8 +65,8 @@ try {
         Write-Host "Added $binDir to PATH"
     }
 
-    Write-Host "`nBase CLI has been installed successfully!" -ForegroundColor Green
-    Write-Host "Please restart your terminal to use the 'base' command"
+    Write-Host "`nBaseNuxt CLI has been installed successfully!" -ForegroundColor Green
+    Write-Host "Please restart your terminal to use the 'basenuxt' command"
 }
 catch {
     Write-Error "Installation failed: $_"
@@ -79,4 +79,4 @@ finally {
     }
 }
 
-Write-Host "`nTo get started, run: base --help"
+Write-Host "`nTo get started, run: basenuxt --help"

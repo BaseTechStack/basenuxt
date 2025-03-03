@@ -5,14 +5,15 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 
 	"github.com/spf13/cobra"
 )
 
 var updateCmd = &cobra.Command{
 	Use:   "update",
-	Short: "Update Base Core to the latest version",
-	Long:  `Update Base Core to the latest version. This command will update the core directory of your Base project to the latest version available on GitHub.`,
+	Short: "Update BaseNuxt Core to the latest version",
+	Long:  `Update BaseNuxt Core to the latest version. This command will update the core directory of your BaseNuxt project to the latest version available on GitHub.`,
 	Run:   updateBaseCore,
 }
 
@@ -21,13 +22,13 @@ func init() {
 }
 
 func updateBaseCore(cmd *cobra.Command, args []string) {
-	fmt.Println("Updating Base Core...")
+	fmt.Println("Updating BaseNuxt Core...")
 	err := updateCore()
 	if err != nil {
-		fmt.Printf("Error updating Base Core: %v\n", err)
+		fmt.Printf("Error updating BaseNuxt Core: %v\n", err)
 		return
 	}
-	fmt.Println("Base Core updated successfully.")
+	fmt.Println("BaseNuxt Core updated successfully.")
 }
 
 func updateCore() error {
@@ -56,6 +57,12 @@ func updateCore() error {
 		return fmt.Errorf("failed to backup current core directory: %v", err)
 	}
 
+	// Exclude nuxt.config.ts and ./structures
+	excludePaths := []string{
+		"nuxt.config.ts",
+		"structures",
+	}
+
 	// Copy core files from temp directory to the project
 	tempCoreDir := filepath.Join(tempDir, "core")
 	err = filepath.Walk(tempCoreDir, func(path string, info os.FileInfo, err error) error {
@@ -63,9 +70,19 @@ func updateCore() error {
 			return err
 		}
 
+		// Skip excluded paths
 		relPath, err := filepath.Rel(tempCoreDir, path)
 		if err != nil {
 			return err
+		}
+
+		for _, exclude := range excludePaths {
+			if strings.Contains(relPath, exclude) {
+				if info.IsDir() {
+					return filepath.SkipDir
+				}
+				return nil
+			}
 		}
 
 		targetPath := filepath.Join(projectCoreDir, relPath)

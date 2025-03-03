@@ -30,47 +30,47 @@ for PLATFORM in "${PLATFORMS[@]}"; do
     
     # Set output binary name
     if [ "$OS" = "windows" ]; then
-        BINARY="base.exe"
+        BINARY="basenuxt.exe"
     else
-        BINARY="base"
+        BINARY="basenuxt"
     fi
 
     # Build
     GOOS=$OS GOARCH=$ARCH go build \
-        -ldflags "-X 'https://github.com/BaseTechStack/basenuxt/version.Version=$VERSION' \
-                  -X 'https://github.com/BaseTechStack/basenuxt/version.CommitHash=$COMMIT_HASH' \
-                  -X 'https://github.com/BaseTechStack/basenuxt/version.BuildDate=$BUILD_DATE' \
-                  -X 'https://github.com/BaseTechStack/basenuxt/version.GoVersion=$GO_VERSION'" \
+        -ldflags "-X 'github.com/BaseTechStack/basenuxt/version.Version=$VERSION' \
+                  -X 'github.com/BaseTechStack/basenuxt/version.CommitHash=$COMMIT_HASH' \
+                  -X 'github.com/BaseTechStack/basenuxt/version.BuildDate=$BUILD_DATE' \
+                  -X 'github.com/BaseTechStack/basenuxt/version.GoVersion=$GO_VERSION'" \
         -o "$BINARY"
 
     # Create archive
     if [ "$OS" = "windows" ]; then
-        zip "base_${PLATFORM}.zip" "$BINARY"
+        zip "basenuxt_${PLATFORM}.zip" "$BINARY"
         rm "$BINARY"
     else
-        tar czf "base_${PLATFORM}.tar.gz" "$BINARY"
+        tar czf "basenuxt_${PLATFORM}.tar.gz" "$BINARY"
         rm "$BINARY"
     fi
 done
 
 # Create GitHub release
-RELEASE_NOTES="Base CLI $VERSION
+RELEASE_NOTES="BaseNuxt CLI $VERSION
 
 What's new:
 $(git log --pretty=format:'- %s' $(git describe --tags --abbrev=0 HEAD^)..HEAD)
 
-To upgrade Base CLI, use:
+To upgrade BaseNuxt CLI, use:
 \`\`\`bash
-base upgrade
+basenuxt upgrade
 \`\`\`"
 
 gh release create "$VERSION" \
-    --title "Base CLI $VERSION" \
+    --title "BaseNuxt CLI $VERSION" \
     --notes "$RELEASE_NOTES" \
-    base_*.{tar.gz,zip}
+    basenuxt_*.{tar.gz,zip}
 
 # Cleanup
 echo "Cleaning up..."
-rm -f base_*.tar.gz base_*.zip
+rm -f basenuxt_*.tar.gz basenuxt_*.zip
 
 echo "Release $VERSION completed successfully!"
