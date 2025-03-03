@@ -17,9 +17,20 @@ PLATFORMS=("darwin_amd64" "darwin_arm64" "linux_amd64" "windows_amd64")
 
 echo "Creating release $VERSION..."
 
-# Create and push tag
+# Check if tag already exists and delete it locally if it does
+if git tag -l "$VERSION" | grep -q "$VERSION"; then
+    echo "Tag $VERSION already exists locally, deleting it..."
+    git tag -d "$VERSION"
+fi
+
+# Create tag locally
 git tag -a "$VERSION" -m "Release $VERSION"
-git push origin "$VERSION"
+
+# Try to push tag to GitHub, but continue if it fails
+echo "Attempting to push tag to GitHub (this may fail if you don't have push access)..."
+if ! git push origin "$VERSION" --force; then
+    echo "Warning: Failed to push tag to GitHub. Continuing with local build..."
+fi
 
 # Build binaries for each platform
 for PLATFORM in "${PLATFORMS[@]}"; do
@@ -53,7 +64,7 @@ for PLATFORM in "${PLATFORMS[@]}"; do
     fi
 done
 
-# Create GitHub release
+# Create GitHub release if gh command is available
 RELEASE_NOTES="BaseNuxt CLI $VERSION
 
 What's new:
@@ -64,13 +75,31 @@ To upgrade BaseNuxt CLI, use:
 basenuxt upgrade
 \`\`\`"
 
-gh release create "$VERSION" \
-    --title "BaseNuxt CLI $VERSION" \
-    --notes "$RELEASE_NOTES" \
-    basenuxt_*.{tar.gz,zip}
+GITHUB_RELEASE_SUCCESS="false"
+if command -v gh &> /dev/null; then
+    echo "Attempting to create GitHub release (this may fail if you don't have proper permissions)..."
+    if gh release create "$VERSION" \
+        --title "BaseNuxt CLI $VERSION" \
+        --notes "$RELEASE_NOTES" \
+        basenuxt_*.{tar.gz,zip}; then
+        GITHUB_RELEASE_SUCCESS="true"
+        echo "GitHub release created successfully."
+    else
+        echo "Warning: Failed to create GitHub release. Archives are still available locally."
+    fi
+else
+    echo "GitHub CLI (gh) not found. Skipping GitHub release creation."
+    echo "The build artifacts are still available locally: basenuxt_*.{tar.gz,zip}"
+fi
 
-# Cleanup
-echo "Cleaning up..."
-rm -f basenuxt_*.tar.gz basenuxt_*.zip
+# Cleanup (only if GitHub release was successful)
+if [ "$GITHUB_RELEASE_SUCCESS" = "true" ]; then
+    echo "Cleaning up..."
+    rm -f basenuxt_*.tar.gz basenuxt_*.zip
+else
+    echo "Keeping build artifacts for local use."
+    echo "Files available in the current directory:"
+    ls -la basenuxt_*.tar.gz basenuxt_*.zip 2>/dev/null || echo "No build artifacts found."
+fi
 
 echo "Release $VERSION completed successfully!"
