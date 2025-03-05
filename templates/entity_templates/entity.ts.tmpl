@@ -1,6 +1,66 @@
 import type { BaseItem } from '@@/app/stores/baseStore'
+
+/**
+ * {{.StructName}} entity interface
+ */
 export interface {{.StructName}} extends BaseItem {
 {{range .Fields}}  {{.JSONName}}{{if not .IsRequired}}?{{end}}: {{.Type}};
 {{end}}  createdAt: string;
   updatedAt: string;
+}
+
+/**
+ * Utility functions for {{.StructName}} entity
+ */
+export class {{.StructName}}Model {
+  /**
+   * Factory method to create a {{.StructName}} from JSON data
+   * Handles conversion from snake_case to camelCase
+   */
+  static fromJson(json: Record<string, any>): {{.StructName}} {
+    // Helper function to convert camelCase to snake_case
+    const toSnakeCase = (str: string) => str.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`)
+    
+    // Helper function to get value from either camelCase or snake_case key
+    const getValue = (obj: Record<string, any>, camelKey: string) => {
+      if (obj[camelKey] !== undefined) return obj[camelKey]
+      const snakeKey = toSnakeCase(camelKey)
+      return obj[snakeKey]
+    }
+    
+    return {
+      id: Number(json.id),
+{{range .Fields}}      {{.JSONName}}: getValue(json, '{{.JSONName}}'),
+{{end}}      createdAt: getValue(json, 'createdAt'),
+      updatedAt: getValue(json, 'updatedAt')
+    }
+  }
+
+  /**
+   * Factory method to create a list of {{.StructName}} from JSON data
+   */
+  static fromJsonList(jsonList: Record<string, any>[]): {{.StructName}}[] {
+    return jsonList.map(json => this.fromJson(json))
+  }
+
+  /**
+   * Convert {{.StructName}} to JSON format (for API requests)
+   * Optionally converts camelCase to snake_case
+   */
+  static toJson(entity: Partial<{{.StructName}}>, useSnakeCase: boolean = false): Record<string, any> {
+    if (!useSnakeCase) {
+      return { ...entity }
+    }
+    
+    // Convert to snake_case for API
+    const result: Record<string, any> = {}
+    
+    Object.entries(entity).forEach(([key, value]) => {
+      // Convert camelCase to snake_case
+      const snakeKey = key.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`)
+      result[snakeKey] = value
+    })
+    
+    return result
+  }
 }

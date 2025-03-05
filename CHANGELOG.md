@@ -5,6 +5,23 @@ All notable changes to the BaseNuxt CLI tool will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.1.7] - 2025-03-05
+
+### Added
+- Added factory methods in entity.ts.tmpl for mapping JSON data to entity models
+- Implemented fromJson and fromJsonList methods to handle both snake_case and camelCase properties
+- Added toJson method to convert model instances back to JSON format
+
+### Changed
+- Updated entity_service.ts.tmpl to use the new factory methods instead of standalone utility functions
+- Modified entities_store.ts.tmpl to use model conversion for API requests
+- Updated view_modal.vue.tmpl to automatically convert raw data to model instances
+
+### Fixed
+- Fixed slot naming in view_modal.vue.tmpl to use #body instead of #content for USlideover component
+- Fixed inconsistent pagination options in page_index.vue.tmpl
+- Fixed event emission in add_modal.vue.tmpl to use entity-specific event names
+
 ## [v0.1.6] - 2025-03-03
 
 ### Added
@@ -98,6 +115,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Fixed issue with entity generation
  
+[v0.1.7]: https://github.com/BaseTechStack/basenuxt/releases/tag/v0.1.7
 [v0.1.6]: https://github.com/BaseTechStack/basenuxt/releases/tag/v0.1.6
 [v0.1.5]: https://github.com/BaseTechStack/basenuxt/releases/tag/v0.1.5
 [v0.1.4]: https://github.com/BaseTechStack/basenuxt/releases/tag/v0.1.4

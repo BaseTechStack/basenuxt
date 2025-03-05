@@ -12,7 +12,7 @@ import (
 // Version information
 var (
 	// Version is the current version of BaseNuxt CLI
-	Version = "0.1.6"
+	Version = "0.1.7"
 
 	// CommitHash is the git commit hash at build time
 	CommitHash = "unknown"

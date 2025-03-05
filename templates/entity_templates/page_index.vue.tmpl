@@ -38,7 +38,7 @@
         <BasePerPage
           :pageSize="store.pagination.pageSize"
           @update:pageSize="handlePageSizeChange"
-          :options="store.viewMode === 'grid' ? [12, 24, 36, 48] : [10, 20, 50, 100]"
+          :options="getPageSizeOptions()"
         />
       
         <BasePagination
@@ -197,6 +197,18 @@ function handlePageSizeChange(size: number) {
   store.pagination.pageSize = size
   store.pagination.page = 1
   store.fetch()
+}
+
+function getPageSizeOptions() {
+  // Common options that work for both grid and table views
+  const commonOptions = [12, 24, 36, 48, 60, 100]
+  
+  // If the current pageSize isn't in our options, add it to ensure it's always available
+  if (!commonOptions.includes(store.pagination.pageSize)) {
+    return [store.pagination.pageSize, ...commonOptions].sort((a, b) => a - b)
+  }
+  
+  return commonOptions
 }
 
 async function handle{{.StructName}}Added(data: Omit<{{.StructName}}, 'id'>) {

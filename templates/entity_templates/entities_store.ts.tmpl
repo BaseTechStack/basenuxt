@@ -8,6 +8,7 @@ declare global {
 }
 
 import type { {{.StructName}} } from './{{.StructName | toLower}}'
+import { {{.StructName}}Model } from './{{.StructName | toLower}}'
 import { defineStore } from 'pinia'
 import { defineBaseStore, type BaseItem } from '@@/app/stores/baseStore'
 import { use{{.StructName}}Service } from '../services/{{.StructName | toLower}}Service'
@@ -24,7 +25,7 @@ export const use{{.PluralName}}Store = defineStore('{{.PluralName | toLower}}', 
     pagination: {
       total: 0,
       page: 1,
-      pageSize: 10,
+      pageSize: 12, // Changed from 10 to 12 to be consistent with our pagination options
       totalPages: 0
     }
   }),
@@ -65,7 +66,9 @@ export const use{{.PluralName}}Store = defineStore('{{.PluralName | toLower}}', 
       this.loading = true
       try {
         const {{.StructName | toLower}}Service = use{{.StructName}}Service()
-        const { item } = await {{.StructName | toLower}}Service.create(data)
+        // Convert data to snake_case for API if needed
+        const apiData = {{.StructName}}Model.toJson(data, true)
+        const { item } = await {{.StructName | toLower}}Service.create(apiData as any)
         this.items.push(item)
         return item
       } catch (error: any) {
@@ -80,7 +83,9 @@ export const use{{.PluralName}}Store = defineStore('{{.PluralName | toLower}}', 
       this.loading = true
       try {
         const {{.StructName | toLower}}Service = use{{.StructName}}Service()
-        const { item } = await {{.StructName | toLower}}Service.update(id, data)
+        // Convert data to snake_case for API if needed
+        const apiData = {{.StructName}}Model.toJson(data, true)
+        const { item } = await {{.StructName | toLower}}Service.update(id, apiData as any)
         const index = this.items.findIndex(i => i.id === id)
         if (index !== -1) {
           this.items[index] = item

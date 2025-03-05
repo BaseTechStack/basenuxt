@@ -1,4 +1,5 @@
 import type { {{.StructName}} } from '../stores/{{.StructName | toLower}}'
+import { {{.StructName}}Model } from '../stores/{{.StructName | toLower}}'
 import type { BaseService } from '@@/app/services/baseService'
 import { use{{.PluralName}} } from '../composables/use{{.PluralName}}'
 import type { BasePagination } from '@@/app/types/base'
@@ -14,10 +15,7 @@ export const use{{.StructName}}Service = (): BaseService<{{.StructName}}> => {
       const result = await {{.PluralName | toLower}}Api.fetch{{.PluralName}}(page, pageSize)
       console.log('{{.StructName}}Service API response:', result)
       return {
-        items: result.{{.PluralName | toLower}}.map(({{.StructName | toLower}}: {{.StructName}}) => ({
-          ...{{.StructName | toLower}},
-          id: Number({{.StructName | toLower}}.id)
-        })),
+        items: {{.StructName}}Model.fromJsonList(result.{{.PluralName | toLower}}),
         pagination: result.pagination
       }
     },
@@ -25,20 +23,14 @@ export const use{{.StructName}}Service = (): BaseService<{{.StructName}}> => {
     async create(data: Omit<{{.StructName}}, 'id'>): Promise<{ item: {{.StructName}} }> {
       const result = await {{.PluralName | toLower}}Api.create{{.StructName}}(data)
       return {
-        item: {
-          ...result.{{.StructName | toLower}},
-          id: Number(result.{{.StructName | toLower}}.id)
-        }
+        item: {{.StructName}}Model.fromJson(result.{{.StructName | toLower}})
       }
     },
 
     async update(id: number, data: Partial<Omit<{{.StructName}}, 'id'>>): Promise<{ item: {{.StructName}} }> {
       const result = await {{.PluralName | toLower}}Api.update{{.StructName}}(id, data)
       return {
-        item: {
-          ...result.{{.StructName | toLower}},
-          id: Number(result.{{.StructName | toLower}}.id)
-        }
+        item: {{.StructName}}Model.fromJson(result.{{.StructName | toLower}})
       }
     },
 

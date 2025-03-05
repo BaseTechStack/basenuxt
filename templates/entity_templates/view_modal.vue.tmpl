@@ -5,7 +5,7 @@
     description="View the details of this {{.StructName}}."
   >
 
-    <template #content>
+    <template #body>
       <div class="space-y-6 p-4">
         <div v-for="field in fields" :key="field.label" class="space-y-1">
           <div class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ "{{" }} field.label {{ "}}" }}</div>
@@ -43,8 +43,10 @@ import { ref, computed, watch } from 'vue'
 import { format } from 'date-fns'
 import { use{{.PluralName}}Store } from '../stores/{{.PluralName | toLower}}Store'
 import type { {{.StructName}} } from '../stores/{{.StructName | toLower}}'
+import { {{.StructName}}Model } from '../stores/{{.StructName | toLower}}'
 
-const formatDate = (dateString: string) => {
+const formatDate = (dateString?: string) => {
+  if (!dateString) return 'N/A'
   try {
     return format(new Date(dateString), 'PPP')
   } catch (e) {
@@ -84,14 +86,22 @@ const populateFields = () => {
   
   fields.value = [
     {{range .Fields}}
-    { label: '{{.Name | ToPascal}}', value: item.value.{{.JSONName}} },
+    { 
+      label: '{{.Name | ToPascal}}', 
+      value: item.value.{{.JSONName}}
+    },
     {{end}}
   ]
 }
 
 const fetchData = () => {
   if (props.{{.StructName | toLower}}) {
-    item.value = props.{{.StructName | toLower}}
+    // Convert the raw data to a proper model instance if needed
+    if (props.{{.StructName | toLower}}.created_at && !props.{{.StructName | toLower}}.createdAt) {
+      item.value = {{.StructName}}Model.fromJson(props.{{.StructName | toLower}} as any)
+    } else {
+      item.value = props.{{.StructName | toLower}}
+    }
     populateFields()
   }
 }
