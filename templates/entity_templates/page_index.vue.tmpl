@@ -211,7 +211,7 @@ function getPageSizeOptions() {
   return commonOptions
 }
 
-async function handle{{.StructName}}Added(data: Omit<{{.StructName}}, 'id'>) {
+async function handle{{.StructName}}Added(data: Partial<{{.StructName}}>) {
   modalState.value.add.loading = true
   try {
     await store.create(data)
