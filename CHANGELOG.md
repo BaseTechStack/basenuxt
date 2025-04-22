@@ -5,6 +5,25 @@ All notable changes to the BaseNuxt CLI tool will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.2.0] - 2025-04-22
+
+### Added
+- Added comprehensive APPNAME replacement throughout entire project
+- Added pre-configured GitHub Actions workflow template in 'github/workflows' (without leading dot)
+- Added detailed section in README about activating GitHub Actions
+- Added support for API URL configuration in runtime config with project name
+
+### Changed
+- Improved project template with more informative README
+- Enhanced file replacement utility to handle all text file formats
+- Renamed .github directory to github to prevent accidental CI/CD activation
+
+### Fixed
+- Fixed file filtering to properly process github directory files
+- Fixed case sensitivity issues when deploying to Linux environments
+- Fixed import paths in store templates to use consistent snake_case naming
+- Updated process.client references to import.meta.client for better TypeScript compatibility
+
 ## [v0.1.8] - 2025-04-22
 
 ### Added
