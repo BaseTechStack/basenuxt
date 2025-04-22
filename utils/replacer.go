@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"unicode/utf8"
 )
 
 // ReplaceInFile replaces all occurrences of a string in a file
@@ -65,13 +66,44 @@ func ReplaceInAllFiles(dirPath, oldString, newString string) error {
 		if binaryExts[ext] {
 			return nil
 		}
+		
+		// Debug: print file being processed
+		// Uncomment for debugging
+		// fmt.Printf("Processing file: %s\n", path)
 
 		// Skip node_modules directory and .git directory (but not .github)
 		if strings.Contains(path, "node_modules") || strings.Contains(path, "/.git/") || strings.HasSuffix(path, "/.git") {
 			return nil
 		}
 
-		// Perform the replacement
-		return ReplaceInFile(path, oldString, newString)
+		// Special handling for known file types
+		
+		// Process the file
+		content, err := os.ReadFile(path)
+		if err != nil {
+			return fmt.Errorf("error reading file %s: %v", path, err)
+		}
+		
+		// Check content type - Some text files may contain binary data
+		if !utf8.Valid(content) {
+			return nil // Skip non-UTF8 content
+		}
+		
+		// Replace the string
+		newContent := strings.ReplaceAll(string(content), oldString, newString)
+		
+		// Write the updated content back to the file
+		err = os.WriteFile(path, []byte(newContent), 0644)
+		if err != nil {
+			return fmt.Errorf("error writing to file %s: %v", path, err)
+		}
+		
+		// For debugging specific files
+		if strings.Contains(path, "nuxt.config.ts") || strings.Contains(path, "workflows") {
+			// Uncomment for debugging
+			// fmt.Printf("Processed %s, replaced %s with %s\n", path, oldString, newString)
+		}
+		
+		return nil
 	})
 }
