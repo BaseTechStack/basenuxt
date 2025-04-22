@@ -7,11 +7,11 @@ declare global {
   }
 }
 
-import type { {{.StructName}} } from './{{.StructName | toLower}}'
-import { {{.StructName}}Model } from './{{.StructName | toLower}}'
+import type { {{.StructName}} } from './{{.StructName | toSnake}}'
+import { {{.StructName}}Model } from './{{.StructName | toSnake}}'
 import { defineStore } from 'pinia'
 import { defineBaseStore, type BaseItem } from '@@/app/stores/baseStore'
-import { use{{.StructName}}Service } from '../services/{{.StructName | toLower}}Service'
+import { use{{.StructName}}Service } from '../services/{{.StructName | toSnake}}_service'
 
 const VIEW_MODE_KEY = '{{.PluralName | toLower}}_view_mode'
 

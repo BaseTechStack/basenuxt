@@ -26,8 +26,10 @@ func createTemplate(name string, content []byte) (*template.Template, error) {
 		"toUpper":  ToUpper,
 		"toPascal": ToPascalCase,
 		"toKebab":  ToKebabCase,
+		"toSnake":  ToSnakeCase,
 		"ToPascal": ToPascalCase,
 		"ToKebab":  ToKebabCase,
+		"ToSnake":  ToSnakeCase,
 		"contains": Contains,
 	}).Parse(string(content))
 

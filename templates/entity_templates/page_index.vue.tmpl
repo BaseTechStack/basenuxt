@@ -110,8 +110,8 @@
 
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
-import { use{{.PluralName}}Store } from '../../stores/{{.PluralName | toLower}}Store'
-import type { {{.StructName}} } from '../../stores/{{.StructName | toLower}}'
+import { use{{.PluralName}}Store } from '../../stores/{{.PluralName | toSnake}}_store'
+import type { {{.StructName}} } from '../../stores/{{.StructName | toSnake}}'
 import { format } from 'date-fns'
 
 interface ModalState {

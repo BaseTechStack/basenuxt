@@ -1,15 +1,6 @@
-import type { {{.StructName}} } from '../stores/{{.StructName | toLower}}'
+import type { {{.StructName}} } from '../stores/{{.StructName | toSnake}}'
 import type { BasePagination } from '@@/app/types/base'
 import { useApi } from '@@/app/composables/useApi'
-
-interface ApiResponse<T> {
-  data: T
-  pagination?: {
-    total: number
-    page: number
-    total_pages: number
-  }
-}
 
 export const use{{.PluralName}} = () => {
   const api = useApi()
@@ -29,6 +20,11 @@ export const use{{.PluralName}} = () => {
     return { {{.PluralName | toLower}}: result.data, pagination }
   }
 
+  const fetch{{.StructName}}ById = async (id: number) => {
+    const result = await api.get(`/{{.PluralName | toLower}}/${id}`)
+    return { {{.StructName | toLower}}: result.data }
+  }
+
   const create{{.StructName}} = async ({{.StructName | toLower}}Data: Omit<{{.StructName}}, 'id'>) => {
     const result = await api.post('/{{.PluralName | toLower}}', {{.StructName | toLower}}Data)
     return { {{.StructName | toLower}}: result.data }
@@ -45,6 +41,7 @@ export const use{{.PluralName}} = () => {
 
   return {
     fetch{{.PluralName}},
+    fetch{{.StructName}}ById,
     create{{.StructName}},
     update{{.StructName}},
     delete{{.StructName}}
