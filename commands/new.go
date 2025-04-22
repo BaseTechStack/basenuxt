@@ -86,6 +86,14 @@ func createNewProject(cmd *cobra.Command, args []string) {
 	// Clean up the temporary directory
 	os.RemoveAll(filepath.Join(projectName, "basenuxt-source-main"))
 
+	// Replace APPNAME with project name in all files
+	fmt.Println("Customizing project files...")
+	err = utils.ReplaceInAllFiles(projectName, "APPNAME", projectName)
+	if err != nil {
+		fmt.Printf("Warning: Error replacing APPNAME placeholders: %v\n", err)
+		// Continue anyway as this is not a critical error
+	}
+
 	// Update package.json with the correct project name
 	packageJSONPath := filepath.Join(projectName, "package.json")
 	if _, err := os.Stat(packageJSONPath); err == nil {

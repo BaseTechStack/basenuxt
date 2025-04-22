@@ -5,6 +5,23 @@ All notable changes to the BaseNuxt CLI tool will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.1.8] - 2025-04-22
+
+### Added
+- Added toSnake template function to all templates for consistent file naming
+- Added support for API URL configuration in runtime config
+
+### Changed
+- Updated import paths in templates to use snake_case for better Linux compatibility
+- Changed entity template file naming to use consistent snake_case (e.g., loan_entry_service.ts)
+- Updated component imports to match the new file naming pattern
+
+### Fixed
+- Fixed case sensitivity issues when deploying to Linux environments
+- Fixed import paths in store templates to correctly reference snake_case file names
+- Updated process.client references to import.meta.client for better TypeScript compatibility
+- Fixed APPNAME replacement to properly process .github directory files
+
 ## [v0.1.7] - 2025-03-05
 
 ### Added
