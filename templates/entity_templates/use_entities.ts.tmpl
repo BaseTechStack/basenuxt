@@ -1,14 +1,14 @@
-import type { {{.StructName}} } from '../stores/{{.StructName | toSnake}}'
+import type { {{.StructName}} } from '../stores/{{.StructName | toPascal}}'
 import type { BasePagination } from '@@/app/types/base'
 import { useApi } from '@@/app/composables/useApi'
 
-export const use{{.PluralName}} = () => {
+export const use{{.PluralName | toPascal}} = () => {
   const api = useApi()
 
-  const fetch{{.PluralName}} = async (page = 1, pageSize = 10) => {
-    console.log('use{{.PluralName}}.fetch{{.PluralName}} called with page:', page, 'pageSize:', pageSize)
+  const fetch{{.PluralName | toPascal}} = async (page = 1, pageSize = 10) => {
+    console.log('use{{.PluralName | toPascal}}.fetch{{.PluralName | toPascal}} called with page:', page, 'pageSize:', pageSize)
     const result = await api.get(`/{{.PluralName | toLower}}?page=${page}&limit=${pageSize}`)
-    console.log('use{{.PluralName}} API response:', result)
+    console.log('use{{.PluralName | toPascal}} API response:', result)
     const total = result.pagination?.total || 0
     const pagination: BasePagination = {
       total: total,
@@ -20,12 +20,12 @@ export const use{{.PluralName}} = () => {
     return { {{.PluralName | toLower}}: result.data, pagination }
   }
 
-  const fetch{{.StructName}}ById = async (id: number) => {
+  const fetch{{.StructName | toPascal}}ById = async (id: number) => {
     const result = await api.get(`/{{.PluralName | toLower}}/${id}`)
     return { {{.StructName | toLower}}: result.data }
   }
 
-  const create{{.StructName}} = async ({{.StructName | toLower}}Data: Omit<{{.StructName}}, 'id'>) => {
+  const create{{.StructName | toPascal}} = async ({{.StructName | toLower}}Data: Omit<{{.StructName}}, 'id'>) => {
     const result = await api.post('/{{.PluralName | toLower}}', {{.StructName | toLower}}Data)
     return { {{.StructName | toLower}}: result.data }
   }
@@ -40,10 +40,10 @@ export const use{{.PluralName}} = () => {
   }
 
   return {
-    fetch{{.PluralName}},
-    fetch{{.StructName}}ById,
-    create{{.StructName}},
-    update{{.StructName}},
-    delete{{.StructName}}
+    fetch{{.PluralName | toPascal}},
+    fetch{{.StructName | toPascal}}ById,
+    create{{.StructName | toPascal}},
+    update{{.StructName | toPascal}},
+    delete{{.StructName | toPascal}}
   }
 }

@@ -7,18 +7,18 @@ declare global {
   }
 }
 
-import type { {{.StructName}} } from './{{.StructName | toSnake}}'
-import { {{.StructName}}Model } from './{{.StructName | toSnake}}'
+import type { {{.StructName | toPascal}} } from './{{.StructName | toSnake}}'
+import { {{.StructName | toPascal}}Model } from './{{.StructName | toSnake}}'
 import { defineStore } from 'pinia'
 import { defineBaseStore, type BaseItem } from '@@/app/stores/baseStore'
-import { use{{.StructName}}Service } from '../services/{{.StructName | toSnake}}_service'
+import { use{{.StructName | toPascal}}Service } from '../services/{{.StructName | toLower}}Service'
 
 const VIEW_MODE_KEY = '{{.PluralName | toLower}}_view_mode'
 
-// Create the {{.PluralName}} store using defineStore directly
-export const use{{.PluralName}}Store = defineStore('{{.PluralName | toLower}}', {
+// Create the {{.PluralName | toPascal}} store using defineStore directly
+export const use{{.PluralName | toPascal}}Store = defineStore('{{.PluralName | toLower}}', {
   state: () => ({
-    items: [] as {{.StructName}}[],
+    items: [] as {{.StructName | toPascal}}[],
     loading: false,
     error: null as string | null,
     viewMode: (typeof window !== 'undefined' ? localStorage.getItem(VIEW_MODE_KEY) as 'grid' | 'table' : null) || 'grid',
@@ -50,7 +50,7 @@ export const use{{.PluralName}}Store = defineStore('{{.PluralName | toLower}}', 
       console.log('{{.PluralName | toLower}}Store fetch called with page:', currentPage, 'pageSize:', pageSize)
       this.loading = true
       try {
-        const {{.StructName | toLower}}Service = use{{.StructName}}Service()
+        const {{.StructName | toLower}}Service = use{{.StructName | toPascal}}Service()
         const { items, pagination } = await {{.StructName | toLower}}Service.fetch(currentPage, pageSize || this.pagination.pageSize)
         this.items = items
         this.pagination = { ...this.pagination, ...pagination }
@@ -62,12 +62,12 @@ export const use{{.PluralName}}Store = defineStore('{{.PluralName | toLower}}', 
       }
     },
     
-    async create(data: Omit<{{.StructName}}, 'id'>): Promise<{{.StructName}}> {
+    async create(data: Omit<{{.StructName | toPascal}}, 'id'>): Promise<{{.StructName | toPascal}}> {
       this.loading = true
       try {
-        const {{.StructName | toLower}}Service = use{{.StructName}}Service()
+        const {{.StructName | toLower}}Service = use{{.StructName | toPascal}}Service()
         // Convert data to snake_case for API if needed
-        const apiData = {{.StructName}}Model.toJson(data, true)
+        const apiData = {{.StructName | toPascal}}Model.toJson(data, true)
         const { item } = await {{.StructName | toLower}}Service.create(apiData as any)
         this.items.push(item)
         return item
@@ -79,12 +79,12 @@ export const use{{.PluralName}}Store = defineStore('{{.PluralName | toLower}}', 
       }
     },
     
-    async update(id: number, data: Partial<Omit<{{.StructName}}, 'id'>>): Promise<{{.StructName}}> {
+    async update(id: number, data: Partial<Omit<{{.StructName | toPascal}}, 'id'>>): Promise<{{.StructName | toPascal}}> {
       this.loading = true
       try {
-        const {{.StructName | toLower}}Service = use{{.StructName}}Service()
+        const {{.StructName | toLower}}Service = use{{.StructName | toPascal}}Service()
         // Convert data to snake_case for API if needed
-        const apiData = {{.StructName}}Model.toJson(data, true)
+        const apiData = {{.StructName | toPascal}}Model.toJson(data, true)
         const { item } = await {{.StructName | toLower}}Service.update(id, apiData as any)
         const index = this.items.findIndex(i => i.id === id)
         if (index !== -1) {
@@ -102,7 +102,7 @@ export const use{{.PluralName}}Store = defineStore('{{.PluralName | toLower}}', 
     async delete(id: number): Promise<void> {
       this.loading = true
       try {
-        const {{.StructName | toLower}}Service = use{{.StructName}}Service()
+        const {{.StructName | toLower}}Service = use{{.StructName | toPascal}}Service()
         await {{.StructName | toLower}}Service.delete(id)
         const index = this.items.findIndex(i => i.id === id)
         if (index !== -1) {
@@ -125,23 +125,23 @@ export const use{{.PluralName}}Store = defineStore('{{.PluralName | toLower}}', 
 // Add these helper methods to provide more descriptive names
 // These functions should only be called from within components or other composables
 // where Pinia is properly initialized
-export function fetch{{.PluralName}}(page = 1, pageSize?: number): Promise<void> {
-  console.log('fetch{{.PluralName}} called with page:', page, 'pageSize:', pageSize)
-  const store = use{{.PluralName}}Store()
+export function fetch{{.PluralName | toPascal}}(page = 1, pageSize?: number): Promise<void> {
+  console.log('fetch{{.PluralName | toPascal}} called with page:', page, 'pageSize:', pageSize)
+  const store = use{{.PluralName | toPascal}}Store()
   return store.fetch(page, pageSize)
 }
 
-export function create{{.StructName}}({{.StructName | toLower}}Data: Omit<{{.StructName}}, 'id'>): Promise<{{.StructName}}> {
-  const store = use{{.PluralName}}Store()
+export function create{{.StructName | toPascal}}({{.StructName | toLower}}Data: Omit<{{.StructName | toPascal}}, 'id'>): Promise<{{.StructName | toPascal}}> {
+  const store = use{{.PluralName | toPascal}}Store()
   return store.create({{.StructName | toLower}}Data)
 }
 
-export function update{{.StructName}}ById(id: number, {{.StructName | toLower}}Data: Partial<Omit<{{.StructName}}, 'id'>>): Promise<{{.StructName}}> {
-  const store = use{{.PluralName}}Store()
+export function update{{.StructName | toPascal}}ById(id: number, {{.StructName | toLower}}Data: Partial<Omit<{{.StructName | toPascal}}, 'id'>>): Promise<{{.StructName | toPascal}}> {
+  const store = use{{.PluralName | toPascal}}Store()
   return store.update(id, {{.StructName | toLower}}Data)
 }
 
-export function delete{{.StructName}}(id: number): Promise<void> {
-  const store = use{{.PluralName}}Store()
+export function delete{{.StructName | toPascal}}(id: number): Promise<void> {
+  const store = use{{.PluralName | toPascal}}Store()
   return store.delete(id)
 }

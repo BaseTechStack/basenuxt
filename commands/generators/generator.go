@@ -69,51 +69,51 @@ func (g *Generator) Generate() error {
 	}
 
 	// Generate Vue components
-	if err := GenerateAddModal(g.BaseDir, componentsDir, g.StructName, g.PluralName, g.Fields); err != nil {
+	if err := GenerateAddModal(g.BaseDir, componentsDir, ToPascalCase(g.StructName), g.PluralName, g.Fields); err != nil {
 		return fmt.Errorf("error generating Add%sModal: %v", g.StructName, err)
 	}
 
-	if err := GenerateEditModal(g.BaseDir, componentsDir, g.StructName, g.PluralName, g.Fields); err != nil {
+	if err := GenerateEditModal(g.BaseDir, componentsDir, ToPascalCase(g.StructName), g.PluralName, g.Fields); err != nil {
 		return fmt.Errorf("error generating Edit%sModal: %v", g.StructName, err)
 	}
 
-	if err := GenerateViewModal(g.BaseDir, componentsDir, g.StructName, g.PluralName, g.Fields); err != nil {
+	if err := GenerateViewModal(g.BaseDir, componentsDir, ToPascalCase(g.StructName), g.PluralName, g.Fields); err != nil {
 		return fmt.Errorf("error generating View%sModal: %v", g.StructName, err)
 	}
 
-	if err := GenerateDeleteModal(g.BaseDir, componentsDir, g.StructName, g.PluralName, g.Fields); err != nil {
+	if err := GenerateDeleteModal(g.BaseDir, componentsDir, ToPascalCase(g.StructName), g.PluralName, g.Fields); err != nil {
 		return fmt.Errorf("error generating Delete%sModal: %v", g.StructName, err)
 	}
 
-	if err := GenerateGrid(g.BaseDir, componentsDir, g.StructName, g.PluralName, g.Fields); err != nil {
+	if err := GenerateGrid(g.BaseDir, componentsDir, ToPascalCase(g.StructName), g.PluralName, g.Fields); err != nil {
 		return fmt.Errorf("error generating %sGrid: %v", g.StructName, err)
 	}
 
-	if err := GenerateGridCard(g.BaseDir, componentsDir, g.StructName, g.PluralName, g.Fields); err != nil {
+	if err := GenerateGridCard(g.BaseDir, componentsDir, ToPascalCase(g.StructName), g.PluralName, g.Fields); err != nil {
 		return fmt.Errorf("error generating %sGridCard: %v", g.StructName, err)
 	}
 
-	if err := GenerateTable(g.BaseDir, componentsDir, g.StructName, g.PluralName, g.Fields); err != nil {
+	if err := GenerateTable(g.BaseDir, componentsDir, ToPascalCase(g.StructName), g.PluralName, g.Fields); err != nil {
 		return fmt.Errorf("error generating %sTable: %v", g.StructName, err)
 	}
 
 	// Generate Composable
-	if err := GenerateComposable(g.BaseDir, composablesDir, g.StructName, g.PluralName, g.Fields); err != nil {
+	if err := GenerateComposable(g.BaseDir, composablesDir, ToPascalCase(g.StructName), g.PluralName, g.Fields); err != nil {
 		return fmt.Errorf("error generating Composable: %v", err)
 	}
 
 	// Generate Service
-	if err := GenerateService(g.BaseDir, servicesDir, g.StructName, g.PluralName, g.Fields); err != nil {
+	if err := GenerateService(g.BaseDir, servicesDir, ToPascalCase(g.StructName), g.PluralName, g.Fields); err != nil {
 		return fmt.Errorf("error generating Service: %v", err)
 	}
 
 	// Generate Page
-	if err := GeneratePage(g.BaseDir, pagesDir, g.StructName, g.PluralName, g.Fields); err != nil {
+	if err := GeneratePage(g.BaseDir, pagesDir, ToPascalCase(g.StructName), g.PluralName, g.Fields); err != nil {
 		return fmt.Errorf("error generating Page: %v", err)
 	}
 
 	// Generate nuxt.config.ts
-	if err := GenerateNuxtConfig(g.BaseDir, entityDir, g.StructName, g.PluralName, g.Fields); err != nil {
+	if err := GenerateNuxtConfig(g.BaseDir, entityDir, ToPascalCase(g.StructName), g.PluralName, g.Fields); err != nil {
 		return fmt.Errorf("error generating nuxt.config.ts: %v", err)
 	}
 

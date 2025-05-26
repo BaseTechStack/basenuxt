@@ -1,8 +1,8 @@
 <template>
   <USlideover
     v-model:open="isOpen"
-    title="View {{.StructName}}"
-    description="View the details of this {{.StructName}}."
+    title="View {{.StructName | toPascal}}"
+    description="View the details of this {{.StructName | toPascal}}."
   >
 
     <template #body>
@@ -41,9 +41,9 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import { format } from 'date-fns'
-import { use{{.PluralName}}Store } from '../stores/{{.PluralName | toLower}}Store'
-import type { {{.StructName}} } from '../stores/{{.StructName | toLower}}'
-import { {{.StructName}}Model } from '../stores/{{.StructName | toLower}}'
+import { use{{.PluralName | toPascal}}Store } from '../stores/{{.PluralName | toLower}}Store'
+import type { {{.StructName | toPascal}} } from '../stores/{{.StructName | toLower}}'
+import { {{.StructName | toPascal}}Model } from '../stores/{{.StructName | toLower}}'
 
 const formatDate = (dateString?: string) => {
   if (!dateString) return 'N/A'
@@ -54,11 +54,11 @@ const formatDate = (dateString?: string) => {
   }
 }
 
-const {{.PluralName | toLower}}Store = use{{.PluralName}}Store()
+const {{.PluralName | toLower}}Store = use{{.PluralName | toPascal}}Store()
 
 const props = defineProps<{
   open?: boolean
-  {{.StructName | toLower}}?: {{.StructName}}
+  {{.StructName | toLower}}?: {{.StructName | toPascal}}
   title?: string
 }>()
 
@@ -78,7 +78,7 @@ const isOpen = computed({
 
 // No need for a computed title as we're using a hardcoded one
 
-const item = ref<{{.StructName}} | null>(null)
+const item = ref<{{.StructName | toPascal}} | null>(null)
 const fields = ref<{label: string, value: any}[]>([])
 
 const populateFields = () => {
@@ -98,7 +98,7 @@ const fetchData = () => {
   if (props.{{.StructName | toLower}}) {
     // Convert the raw data to a proper model instance if needed
     if (props.{{.StructName | toLower}}.created_at && !props.{{.StructName | toLower}}.createdAt) {
-      item.value = {{.StructName}}Model.fromJson(props.{{.StructName | toLower}} as any)
+      item.value = {{.StructName | toPascal}}Model.fromJson(props.{{.StructName | toLower}} as any)
     } else {
       item.value = props.{{.StructName | toLower}}
     }

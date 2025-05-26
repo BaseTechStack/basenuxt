@@ -21,12 +21,12 @@
 </template>
 
 <script setup lang="ts">
-import type { {{.StructName}} } from '../stores/{{.StructName | toLower}}'
+import type { {{.StructName | toPascal}} } from '../stores/{{.StructName | toLower}}'
 import { ref, h, resolveComponent, computed } from 'vue'
-import type { TableColumn } from '@nuxt/ui'
+import type { TableColumn } from '#imports'
 
 interface Props {
-  {{.StructName | toLower}}: {{.StructName}}[]
+  {{.StructName | toLower}}: {{.StructName | toPascal}}[]
   loading?: boolean
   error?: string | null
 }
@@ -37,16 +37,16 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const emit = defineEmits<{
-  (e: 'edit', {{.StructName | toLower}}: {{.StructName}}): void
-  (e: 'delete', {{.StructName | toLower}}: {{.StructName}}): void
-  (e: 'view', {{.StructName | toLower}}: {{.StructName}}): void
+  (e: 'edit', {{.StructName | toLower}}: {{.StructName | toPascal}}): void
+  (e: 'delete', {{.StructName | toLower}}: {{.StructName | toPascal}}): void
+  (e: 'view', {{.StructName | toLower}}: {{.StructName | toPascal}}): void
 }>()
 
 const search = ref('')
 
 const {{.PluralName | toLower}} = computed(() => props.{{.StructName | toLower}})
 
-const columns: TableColumn<{{.StructName}}>[] = [
+const columns: TableColumn<{{.StructName | toPascal}}>[] = [
   {
     accessorKey: 'id',
     header: 'ID'
@@ -70,21 +70,21 @@ const columns: TableColumn<{{.StructName}}>[] = [
         variant: 'ghost',
         icon: 'i-heroicons-eye',
         size: 'xs',
-        onClick: () => emit('view', row as unknown as {{.StructName}})
+        onClick: () => emit('view', row as unknown as {{.StructName | toPascal}})
       }),
       h(resolveComponent('UButton'), {
         color: 'primary',
         variant: 'ghost',
         icon: 'i-heroicons-pencil-square',
         size: 'xs',
-        onClick: () => emit('edit', row as unknown as {{.StructName}})
+        onClick: () => emit('edit', row as unknown as {{.StructName | toPascal}})
       }),
       h(resolveComponent('UButton'), {
         color: 'red',
         variant: 'ghost',
         icon: 'i-heroicons-trash',
         size: 'xs',
-        onClick: () => emit('delete', row as unknown as {{.StructName}})
+        onClick: () => emit('delete', row as unknown as {{.StructName | toPascal}})
       })
     ])
   }

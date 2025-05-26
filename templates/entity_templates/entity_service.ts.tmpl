@@ -1,11 +1,11 @@
 import type { {{.StructName}} } from '../stores/{{.StructName | toSnake}}'
 import { {{.StructName}}Model } from '../stores/{{.StructName | toSnake}}'
 import type { BaseService } from '@@/app/services/baseService'
-import { use{{.PluralName}} } from '../composables/use_{{.PluralName | toSnake}}'
+import { use{{.PluralName | toPascal}} } from '../composables/use{{.PluralName | toPascal}}'
 import type { BasePagination } from '@@/app/types/base'
 
 // Use a composable pattern to ensure Pinia is initialized before using the store
-export const use{{.StructName}}Service = (): BaseService<{{.StructName}}> => {
+export const use{{.StructName | toPascal}}Service = (): BaseService<{{.StructName}}> => {
   // Only create use{{.PluralName}}() when the composable is called, not at module level
   const {{.PluralName | toLower}}Api = use{{.PluralName}}()
   
@@ -25,14 +25,14 @@ export const use{{.StructName}}Service = (): BaseService<{{.StructName}}> => {
         item: {{.StructName}}Model.fromJson(result.{{.StructName | toLower}})
       }
     },
-    async create(data: Omit<{{.StructName}}, 'id'>): Promise<{ item: {{.StructName}} }> {
+    async create(data: Omit<{{.StructName | toPascal}}, 'id'>): Promise<{ item: {{.StructName | toPascal}} }> {
       const result = await {{.PluralName | toLower}}Api.create{{.StructName}}(data)
       return {
         item: {{.StructName}}Model.fromJson(result.{{.StructName | toLower}})
       }
     },
 
-    async update(id: number, data: Partial<Omit<{{.StructName}}, 'id'>>): Promise<{ item: {{.StructName}} }> {
+    async update(id: number, data: Partial<Omit<{{.StructName | toPascal}}, 'id'>>): Promise<{ item: {{.StructName | toPascal}} }> {
       const result = await {{.PluralName | toLower}}Api.update{{.StructName}}(id, data)
       return {
         item: {{.StructName}}Model.fromJson(result.{{.StructName | toLower}})
