@@ -2,7 +2,7 @@
 
 # Function to get the latest release version
 function Get-LatestRelease {
-    $releaseUrl = "https://api.github.com/repos/basetechstack/basenuxt/releases/latest"
+    $releaseUrl = "https://api.github.com/repos/BaseTechStack/bux/releases/latest"
     try {
         $release = Invoke-RestMethod -Uri $releaseUrl -ErrorAction Stop
         return $release.tag_name
@@ -21,14 +21,14 @@ function Ensure-Directory {
     }
 }
 
-Write-Host "Installing BaseNuxt CLI..." -ForegroundColor Green
+Write-Host "Installing BUX CLI..." -ForegroundColor Green
 
 # Detect architecture
 $arch = if ([Environment]::Is64BitOperatingSystem) { "amd64" } else { "386" }
 Write-Host "Architecture: windows_$arch"
 
 # Set installation paths
-$installDir = Join-Path $env:USERPROFILE ".basenuxt"
+$installDir = Join-Path $env:USERPROFILE ".bux"
 $binDir = Join-Path $env:USERPROFILE "bin"
 
 # Create directories
@@ -40,10 +40,10 @@ $version = Get-LatestRelease
 Write-Host "Latest version: $version"
 
 # Download URL
-$downloadUrl = "https://github.com/BaseTechStack/basenuxt/releases/download/$version/basenuxt_windows_$arch.zip"
-$zipPath = Join-Path $env:TEMP "basenuxt.zip"
-$exePath = Join-Path $installDir "basenuxt.exe"
-$binPath = Join-Path $binDir "basenuxt.exe"
+$downloadUrl = "https://github.com/BaseTechStack/bux/releases/download/$version/bux_windows_$arch.zip"
+$zipPath = Join-Path $env:TEMP "bux.zip"
+$exePath = Join-Path $installDir "bux.exe"
+$binPath = Join-Path $binDir "bux.exe"
 
 Write-Host "Downloading from: $downloadUrl"
 
@@ -65,8 +65,8 @@ try {
         Write-Host "Added $binDir to PATH"
     }
 
-    Write-Host "`nBaseNuxt CLI has been installed successfully!" -ForegroundColor Green
-    Write-Host "Please restart your terminal to use the 'basenuxt' command"
+    Write-Host "`nBUX CLI has been installed successfully!" -ForegroundColor Green
+    Write-Host "Please restart your terminal to use the 'bux' command"
 }
 catch {
     Write-Error "Installation failed: $_"
@@ -79,4 +79,4 @@ finally {
     }
 }
 
-Write-Host "`nTo get started, run: basenuxt --help"
+Write-Host "`nTo get started, run: bux --help"

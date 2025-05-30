@@ -13,7 +13,7 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/BaseTechStack/basenuxt/version"
+	"github.com/BaseTechStack/bux/version"
 
 	"github.com/spf13/cobra"
 )
@@ -45,14 +45,14 @@ func extractTarGz(gzipStream io.Reader, targetPath string) error {
 			return err
 		}
 
-		// We're looking for the binary file which should be named "basenuxt" or "basenuxt.exe"
+		// We're looking for the binary file which should be named "bux" or "bux.exe"
 		if strings.HasSuffix(header.Name, "/") {
 			continue
 		}
 		baseName := filepath.Base(header.Name)
-		expectedName := "basenuxt"
+		expectedName := "bux"
 		if runtime.GOOS == "windows" {
-			expectedName = "basenuxt.exe"
+			expectedName = "bux.exe"
 		}
 
 		if baseName == expectedName {
@@ -118,7 +118,7 @@ func downloadAndInstall(url, targetPath string) error {
 
 	// Create a temporary file for the archive
 	tmpDir := os.TempDir()
-	tmpArchive := filepath.Join(tmpDir, "basenuxt-archive")
+	tmpArchive := filepath.Join(tmpDir, "bux-archive")
 	out, err := os.Create(tmpArchive)
 	if err != nil {
 		return err
@@ -181,7 +181,7 @@ func runWithSudo(command string, args ...string) error {
 
 var upgradeCmd = &cobra.Command{
 	Use:   "upgrade",
-	Short: "Upgrade BaseNuxt CLI to the latest version",
+	Short: "Upgrade BaseUX (bux) CLI to the latest version",
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("Checking for updates...")
 
@@ -202,7 +202,7 @@ var upgradeCmd = &cobra.Command{
 		// Determine the correct asset name based on OS and architecture
 		osName := runtime.GOOS
 		archName := runtime.GOARCH
-		assetPrefix := fmt.Sprintf("basenuxt_%s_%s", osName, archName)
+		assetPrefix := fmt.Sprintf("bux_%s_%s", osName, archName)
 		var assetSuffix string
 		if osName == "windows" {
 			assetSuffix = ".zip"
@@ -227,7 +227,7 @@ var upgradeCmd = &cobra.Command{
 
 		// Create a temporary file for the binary
 		tmpDir := os.TempDir()
-		tmpFile := filepath.Join(tmpDir, "basenuxt-new")
+		tmpFile := filepath.Join(tmpDir, "bux-new")
 
 		// Download and extract the new version
 		if err := downloadAndInstall(downloadURL, tmpFile); err != nil {
@@ -259,9 +259,9 @@ var upgradeCmd = &cobra.Command{
 				os.Remove(tmpFile)
 				return
 			}
-			installDir = filepath.Join(homeDir, ".basenuxt")
+			installDir = filepath.Join(homeDir, ".bux")
 			binDir = filepath.Join(homeDir, "bin")
-			binaryName = "basenuxt.exe"
+			binaryName = "bux.exe"
 		} else {
 			homeDir, err := os.UserHomeDir()
 			if err != nil {
@@ -269,9 +269,9 @@ var upgradeCmd = &cobra.Command{
 				os.Remove(tmpFile)
 				return
 			}
-			installDir = filepath.Join(homeDir, ".basenuxt")
+			installDir = filepath.Join(homeDir, ".bux")
 			binDir = "/usr/local/bin"
-			binaryName = "basenuxt"
+			binaryName = "bux"
 		}
 
 		// Create installation directories

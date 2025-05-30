@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/BaseTechStack/basenuxt/version"
+	"github.com/BaseTechStack/bux/version"
 
 	"github.com/spf13/cobra"
 )

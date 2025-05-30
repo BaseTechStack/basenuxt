@@ -8,7 +8,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/BaseTechStack/basenuxt/commands/generators"
+	"github.com/BaseTechStack/bux/commands/generators"
 
 	"github.com/spf13/cobra"
 )

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	commands "github.com/BaseTechStack/basenuxt/commands"
+	commands "github.com/BaseTechStack/bux/commands"
 )
 
 func main() {

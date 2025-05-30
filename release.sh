@@ -41,47 +41,47 @@ for PLATFORM in "${PLATFORMS[@]}"; do
     
     # Set output binary name
     if [ "$OS" = "windows" ]; then
-        BINARY="basenuxt.exe"
+        BINARY="bux.exe"
     else
-        BINARY="basenuxt"
+        BINARY="bux"
     fi
 
     # Build
     GOOS=$OS GOARCH=$ARCH go build \
-        -ldflags "-X 'github.com/BaseTechStack/basenuxt/version.Version=$VERSION' \
-                  -X 'github.com/BaseTechStack/basenuxt/version.CommitHash=$COMMIT_HASH' \
-                  -X 'github.com/BaseTechStack/basenuxt/version.BuildDate=$BUILD_DATE' \
-                  -X 'github.com/BaseTechStack/basenuxt/version.GoVersion=$GO_VERSION'" \
+        -ldflags "-X 'github.com/BaseTechStack/bux/version.Version=$VERSION' \
+                  -X 'github.com/BaseTechStack/bux/version.CommitHash=$COMMIT_HASH' \
+                  -X 'github.com/BaseTechStack/bux/version.BuildDate=$BUILD_DATE' \
+                  -X 'github.com/BaseTechStack/bux/version.GoVersion=$GO_VERSION'" \
         -o "$BINARY"
 
     # Create archive
     if [ "$OS" = "windows" ]; then
-        zip "basenuxt_${PLATFORM}.zip" "$BINARY"
+        zip "bux_${PLATFORM}.zip" "$BINARY"
         rm "$BINARY"
     else
-        tar czf "basenuxt_${PLATFORM}.tar.gz" "$BINARY"
+        tar czf "bux_${PLATFORM}.tar.gz" "$BINARY"
         rm "$BINARY"
     fi
 done
 
 # Create GitHub release if gh command is available
-RELEASE_NOTES="BaseNuxt CLI $VERSION
+RELEASE_NOTES="Bux CLI $VERSION
 
 What's new:
 $(git log --pretty=format:'- %s' $(git describe --tags --abbrev=0 HEAD^)..HEAD)
 
-To upgrade BaseNuxt CLI, use:
+To upgrade Bux CLI, use:
 \`\`\`bash
-basenuxt upgrade
+bux upgrade
 \`\`\`"
 
 GITHUB_RELEASE_SUCCESS="false"
 if command -v gh &> /dev/null; then
     echo "Attempting to create GitHub release (this may fail if you don't have proper permissions)..."
     if gh release create "$VERSION" \
-        --title "BaseNuxt CLI $VERSION" \
+        --title "Bux CLI $VERSION" \
         --notes "$RELEASE_NOTES" \
-        basenuxt_*.{tar.gz,zip}; then
+        bux_*.{tar.gz,zip}; then
         GITHUB_RELEASE_SUCCESS="true"
         echo "GitHub release created successfully."
     else
@@ -89,17 +89,17 @@ if command -v gh &> /dev/null; then
     fi
 else
     echo "GitHub CLI (gh) not found. Skipping GitHub release creation."
-    echo "The build artifacts are still available locally: basenuxt_*.{tar.gz,zip}"
+    echo "The build artifacts are still available locally: bux_*.{tar.gz,zip}"
 fi
 
 # Cleanup (only if GitHub release was successful)
 if [ "$GITHUB_RELEASE_SUCCESS" = "true" ]; then
     echo "Cleaning up..."
-    rm -f basenuxt_*.tar.gz basenuxt_*.zip
+    rm -f bux_*.tar.gz bux_*.zip
 else
     echo "Keeping build artifacts for local use."
     echo "Files available in the current directory:"
-    ls -la basenuxt_*.tar.gz basenuxt_*.zip 2>/dev/null || echo "No build artifacts found."
+    ls -la bux_*.tar.gz bux_*.zip 2>/dev/null || echo "No build artifacts found."
 fi
 
 echo "Release $VERSION completed successfully!"

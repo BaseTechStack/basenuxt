@@ -1,13 +1,13 @@
-# BaseNuxt Update Guide
+# BUX Update Guide
 
-This document provides instructions for updating the BaseNuxt CLI to the latest version.
+This document provides instructions for updating the BUX CLI to the latest version.
 
 ## Automatic Update
 
-The BaseNuxt CLI includes a built-in update command that will automatically download and install the latest version:
+The BUX CLI includes a built-in update command that will automatically download and install the latest version:
 
 ```bash
-basenuxt update
+bux update
 ```
 
 This command will:
@@ -22,13 +22,13 @@ If you prefer to update manually, you can follow these steps:
 ### macOS and Linux
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/BaseTechStack/basenuxt/main/install.sh | bash
+curl -sSL https://raw.githubusercontent.com/BaseTechStack/bux/main/install.sh | bash
 ```
 
 If you need to install in a protected directory (like `/usr/local/bin`), use:
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/BaseTechStack/basenuxt/main/install.sh | sudo bash
+curl -sSL https://raw.githubusercontent.com/BaseTechStack/bux/main/install.sh | sudo bash
 ```
 
 ### Windows
@@ -36,13 +36,13 @@ curl -sSL https://raw.githubusercontent.com/BaseTechStack/basenuxt/main/install.
 #### Option 1: Using PowerShell
 
 ```powershell
-iwr -useb https://raw.githubusercontent.com/BaseTechStack/basenuxt/main/install.ps1 | iex
+iwr -useb https://raw.githubusercontent.com/BaseTechStack/bux/main/install.ps1 | iex
 ```
 
 #### Option 2: Using Git Bash
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/BaseTechStack/basenuxt/main/install.sh | bash
+curl -sSL https://raw.githubusercontent.com/BaseTechStack/bux/main/install.sh | bash
 ```
 
 ## Verifying the Update
@@ -50,14 +50,14 @@ curl -sSL https://raw.githubusercontent.com/BaseTechStack/basenuxt/main/install.
 After updating, you can verify the installed version with:
 
 ```bash
-basenuxt --version
+bux --version
 ```
 
 ## Downgrading to a Specific Version
 
-If you need to install a specific version of BaseNuxt CLI, you can download the binary directly from the GitHub releases page:
+If you need to install a specific version of BUX CLI, you can download the binary directly from the GitHub releases page:
 
-https://github.com/BaseTechStack/basenuxt/releases
+https://github.com/BaseTechStack/bux/releases
 
 Download the appropriate archive for your system, extract it, and place the binary in your PATH.
 
@@ -69,8 +69,8 @@ If you encounter issues during the update process:
 
 2. **Binary Not Found**: Ensure that the installation directory is in your PATH.
 
-3. **Version Not Updated**: Check if you have multiple copies of BaseNuxt CLI installed on your system. Use `which basenuxt` (Unix) or `where basenuxt` (Windows) to locate all instances.
+3. **Version Not Updated**: Check if you have multiple copies of BUX CLI installed on your system. Use `which bux` (Unix) or `where bux` (Windows) to locate all instances.
 
 4. **Network Issues**: If you're behind a proxy or firewall, you may need to configure your network settings to allow downloads from GitHub.
 
-For further assistance, please open an issue on the [GitHub repository](https://github.com/BaseTechStack/basenuxt/issues).
+For further assistance, please open an issue on the [GitHub repository](https://github.com/BaseTechStack/bux/issues).

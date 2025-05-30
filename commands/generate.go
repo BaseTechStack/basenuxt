@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/BaseTechStack/basenuxt/commands/generators"
+	"github.com/BaseTechStack/bux/commands/generators"
 	"github.com/spf13/cobra"
 )
 
@@ -41,17 +41,17 @@ func run(cmd *cobra.Command, args []string) {
 
 	// Parse the entity name and fields
 	fmt.Println("🔍 Parsing entity structure...")
-	
+
 	entityName := args[0]
 	var fieldStrs []string
-	
+
 	if len(args) > 1 {
 		fieldStrs = args[1:]
 	}
-	
+
 	// Initialize the generator
 	generator := generators.NewGenerator(baseDir, entityName, fieldStrs)
-	
+
 	// Generate the entity
 	if err := generator.Generate(); err != nil {
 		fmt.Printf("❌ Error generating entity: %v\n", err)

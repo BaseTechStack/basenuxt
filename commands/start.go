@@ -9,10 +9,11 @@ import (
 )
 
 var startCmd = &cobra.Command{
-	Use:     "start [command]",
-	Short:   "Start the application",
-	Long:    `Start the application with various commands using Bun`,
-	Example: "basenuxt start dev     # Run development server\nbasenuxt start generate # Generate static site\nbasenuxt start build    # Build the application",
+	Use:     "start",
+	Aliases: []string{"s"},
+	Short:   "Start the development server",
+	Long:    `Start the development server using Bun`,
+	Example: "basenuxt start     # Run development server\nbasenuxt s        # Run development server (shorthand)",
 	Run:     startApplication,
 }
 
@@ -21,6 +22,12 @@ func init() {
 }
 
 func startApplication(cmd *cobra.Command, args []string) {
+	// If arguments are provided, show usage info
+	if len(args) > 0 {
+		fmt.Println("The start command doesn't accept arguments. Use it without arguments to start the development server.")
+		fmt.Println("For other commands, use 'basenuxt run <command>' or the shortcuts 'b' for build and 'g' for generate.")
+		return
+	}
 	cwd, err := os.Getwd()
 	if err != nil {
 		fmt.Printf("Error getting current directory: %v\n", err)
@@ -34,31 +41,8 @@ func startApplication(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	// Default command is "dev" if no subcommand is provided
+	// Always run dev command
 	bunScript := "dev"
-
-	// If args are provided, use the first arg as the bun script to run
-	if len(args) > 0 {
-		bunScript = args[0]
-	}
-
-	// Map of supported script commands
-	supportedScripts := map[string]bool{
-		"dev":         true,
-		"build":       true,
-		"generate":    true,
-		"preview":     true,
-		"postinstall": true,
-		"lint":        true,
-		"lint:fix":    true,
-	}
-
-	// Check if the script is supported
-	if _, exists := supportedScripts[bunScript]; !exists {
-		fmt.Printf("Unsupported command: %s\n", bunScript)
-		fmt.Println("Supported commands: dev, build, generate, preview, postinstall, lint, lint:fix")
-		return
-	}
 
 	fmt.Printf("Running: bun run %s\n", bunScript)
 	bunCmd := exec.Command("bun", "run", bunScript)

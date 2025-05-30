@@ -11,8 +11,8 @@ import (
 
 // Version information
 var (
-	// Version is the current version of BaseNuxt CLI
-	Version = "0.3.0"
+	// Version is the current version of BaseUX (bux) CLI
+	Version = "0.4.0"
 
 	// CommitHash is the git commit hash at build time
 	CommitHash = "unknown"
@@ -22,6 +22,9 @@ var (
 
 	// GoVersion is the version of Go used to build the binary
 	GoVersion = "unknown"
+
+	// BunVersion is the version of Bun used to build the binary
+	BunVersion = "unknown"
 )
 
 // BuildInfo contains all version information
@@ -30,6 +33,7 @@ type BuildInfo struct {
 	CommitHash string `json:"commit_hash"`
 	BuildDate  string `json:"build_date"`
 	GoVersion  string `json:"go_version"`
+	BunVersion string `json:"bun_version"`
 }
 
 // Release represents a GitHub release
@@ -54,18 +58,19 @@ func GetBuildInfo() BuildInfo {
 		CommitHash: CommitHash,
 		BuildDate:  BuildDate,
 		GoVersion:  GoVersion,
+		BunVersion: BunVersion,
 	}
 }
 
 // String returns a string representation of version information
 func (bi BuildInfo) String() string {
-	return fmt.Sprintf("BaseNuxt CLI %s\nCommit: %s\nBuilt: %s\nGo version: %s",
-		bi.Version, bi.CommitHash, bi.BuildDate, bi.GoVersion)
+	return fmt.Sprintf("BaseUX (bux) CLI %s\nCommit: %s\nBuilt:  %s\nGo version: %s\nBun version: %s",
+		bi.Version, bi.CommitHash, bi.BuildDate, bi.GoVersion, bi.BunVersion)
 }
 
 // CheckLatestVersion checks GitHub for newer releases
 func CheckLatestVersion() (*Release, error) {
-	url := "https://api.github.com/repos/BaseTechStack/basenuxt/releases/latest"
+	url := "https://api.github.com/repos/BaseTechStack/bux/releases/latest"
 	resp, err := http.Get(url)
 	if err != nil {
 		return nil, err
@@ -105,12 +110,12 @@ func HasUpdate(current, latest string) bool {
 func FormatUpdateMessage(current, latest, releaseURL, releaseNotes string) string {
 	var sb strings.Builder
 	sb.WriteString(fmt.Sprintf("\n📦 Update available! %s → %s\n", current, latest))
-	sb.WriteString("Run: basenuxt upgrade\n")
+	sb.WriteString("Run: bux upgrade\n")
 	sb.WriteString(fmt.Sprintf("Release notes: %s\n", releaseURL))
 	if releaseNotes != "" {
-		sb.WriteString(fmt.Sprintf("\nChangelog:\nBaseNuxt CLI v%s\n", latest))
+		sb.WriteString(fmt.Sprintf("\nChangelog:\nbux v%s\n", latest))
 		sb.WriteString(fmt.Sprintf("\nWhat's new:\n%s\n", releaseNotes))
-		sb.WriteString("\nTo upgrade BaseNuxt CLI, use:\n```bash\nbasenuxt upgrade\n```\n")
+		sb.WriteString("\nTo upgrade bux, use:\n```bash\nbux upgrade\n```\n")
 	}
 	return sb.String()
 }

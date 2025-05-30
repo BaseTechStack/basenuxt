@@ -8,7 +8,7 @@ import (
 	"os/exec"
 	"path/filepath"
 
-	"github.com/BaseTechStack/basenuxt/utils"
+	"github.com/BaseTechStack/bux/utils"
 
 	"github.com/spf13/cobra"
 )
@@ -27,7 +27,7 @@ func init() {
 
 func createNewProject(cmd *cobra.Command, args []string) {
 	projectName := args[0]
-	archiveURL := "https://github.com/BaseTechStack/basenuxt-source/archive/main.zip"
+	archiveURL := "https://github.com/BaseTechStack/bux-source/archive/main.zip"
 
 	// Create the project directory
 	err := os.Mkdir(projectName, 0755)
@@ -67,15 +67,15 @@ func createNewProject(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	// Loop through each file/directory in the basenuxt-source-main directory and move it to the project root
-	files, err := os.ReadDir(filepath.Join(projectName, "basenuxt-source-main"))
+	// Loop through each file/directory in the bux-source-main directory and move it to the project root
+	files, err := os.ReadDir(filepath.Join(projectName, "bux-source-main"))
 	if err != nil {
 		fmt.Printf("Error reading extracted files: %v\n", err)
 		return
 	}
 
 	for _, f := range files {
-		oldPath := filepath.Join(projectName, "basenuxt-source-main", f.Name())
+		oldPath := filepath.Join(projectName, "bux-source-main", f.Name())
 		newPath := filepath.Join(projectName, f.Name())
 		if err := os.Rename(oldPath, newPath); err != nil {
 			fmt.Printf("Error moving file/directory %s: %v\n", f.Name(), err)
@@ -84,7 +84,7 @@ func createNewProject(cmd *cobra.Command, args []string) {
 	}
 
 	// Clean up the temporary directory
-	os.RemoveAll(filepath.Join(projectName, "basenuxt-source-main"))
+	os.RemoveAll(filepath.Join(projectName, "bux-source-main"))
 
 	// Replace APPNAME with project name in all files
 	fmt.Println("Customizing project files...")
@@ -104,7 +104,7 @@ func createNewProject(cmd *cobra.Command, args []string) {
 		} else {
 			// Replace the name field with the project name
 			updatedJSON := utils.ReplaceJSONField(string(packageJSON), "name", "\""+projectName+"\"")
-			
+
 			// Write the updated package.json file
 			err = os.WriteFile(packageJSONPath, []byte(updatedJSON), 0644)
 			if err != nil {
@@ -121,18 +121,18 @@ func createNewProject(cmd *cobra.Command, args []string) {
 	}
 
 	fmt.Printf("New project '%s' created successfully at %s\n", projectName, absPath)
-	
+
 	// Install dependencies
 	fmt.Println("Installing dependencies...")
-	
+
 	// Check if bun is available
 	bunCmd := exec.Command("bun", "--version")
 	bunAvailable := bunCmd.Run() == nil
-	
+
 	// Check if yarn is available
 	yarnCmd := exec.Command("yarn", "--version")
 	yarnAvailable := yarnCmd.Run() == nil
-	
+
 	// Change to the project directory
 	originalDir, err := os.Getwd()
 	if err != nil {
@@ -140,12 +140,12 @@ func createNewProject(cmd *cobra.Command, args []string) {
 		return
 	}
 	defer os.Chdir(originalDir) // Change back to original directory when done
-	
+
 	if err := os.Chdir(absPath); err != nil {
 		fmt.Printf("Error changing to project directory: %v\n", err)
 		return
 	}
-	
+
 	// Run bun, yarn or npm install based on availability (in that order of preference)
 	var installCmd *exec.Cmd
 	if bunAvailable {
@@ -158,16 +158,16 @@ func createNewProject(cmd *cobra.Command, args []string) {
 		fmt.Println("Using npm to install dependencies...")
 		installCmd = exec.Command("npm", "install")
 	}
-	
+
 	installCmd.Stdout = os.Stdout
 	installCmd.Stderr = os.Stderr
-	
+
 	if err := installCmd.Run(); err != nil {
 		fmt.Printf("Error installing dependencies: %v\n", err)
 		fmt.Println("You may need to run 'npm install', 'yarn install', or 'bun install' manually.")
 	} else {
 		fmt.Println("Dependencies installed successfully!")
 	}
-	
+
 	fmt.Println("You can now start working on your new project!")
 }

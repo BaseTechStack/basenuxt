@@ -33,7 +33,7 @@ func updateBaseCore(cmd *cobra.Command, args []string) {
 
 func updateCore() error {
 	// Define the core repository URL
-	coreRepoURL := "https://github.com/BaseTechStack/basenuxt.git"
+	coreRepoURL := "https://github.com/BaseTechStack/bux.git"
 
 	// Create a temporary directory
 	tempDir, err := os.MkdirTemp("", "basenuxt-core-update")

@@ -6,7 +6,7 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/BaseTechStack/basenuxt/templates"
+	"github.com/BaseTechStack/bux/templates"
 )
 
 // loadTemplate loads a template from the embedded filesystem

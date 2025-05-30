@@ -2,17 +2,19 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 	"strings"
 
-	"github.com/BaseTechStack/basenuxt/version"
+	"github.com/BaseTechStack/bux/version"
 
 	"github.com/spf13/cobra"
 )
 
 var rootCmd = &cobra.Command{
-	Use:   "basenuxt",
-	Short: "BaseNuxt CLI - A modern Nuxt scaffolding framework",
-	Long: `BaseNuxt CLI is a powerful tool for building modern Nuxt applications.
+	Use:     "bux",
+	Aliases: []string{"basenuxt"},
+	Short:   "BaseUX CLI - A modern Nuxt scaffolding framework",
+	Long: `BaseUX (bux) CLI is a powerful tool for building modern Nuxt applications.
 It provides scaffolding, code generation, and development utilities. Works best with the BaseNuxt framework.`,
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
 		// Skip version check for version and upgrade commands
@@ -39,6 +41,11 @@ It provides scaffolding, code generation, and development utilities. Works best 
 }
 
 func Execute() error {
+	// Check if the command was invoked as basenuxt (deprecated)
+	if len(os.Args) > 0 && strings.Contains(os.Args[0], "basenuxt") {
+		fmt.Println("⚠️  Warning: The 'basenuxt' command is deprecated and will be removed in a future version.")
+		fmt.Println("   Please use 'bux' instead, which provides the same functionality.")
+	}
 	return rootCmd.Execute()
 }
 

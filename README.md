@@ -1,20 +1,22 @@
-# BaseNuxt - Command Line Tool for Nuxt Application Scaffolding
+# BaseUX (bux) - Command Line Tool for Nuxt Application Scaffolding
 
-BaseNuxt is a powerful command-line tool designed to streamline development with Nuxt.js applications.
+BaseUX (bux) is a powerful command-line tool designed to streamline development with Nuxt.js applications.
 It offers scaffolding, module generation, and utilities to accelerate Vue/Nuxt development.
+
+> **Note:** The command name has changed from `basenuxt` to `bux`. The old name is still supported but deprecated.
 
 ## Installation
 
 ### macOS and Linux
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/BaseTechStack/basenuxt/main/install.sh | bash
+curl -sSL https://raw.githubusercontent.com/BaseTechStack/bux/main/install.sh | bash
 ```
 
 If you need to install in a protected directory (like `/usr/local/bin`), use:
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/BaseTechStack/basenuxt/main/install.sh | sudo bash
+curl -sSL https://raw.githubusercontent.com/BaseTechStack/bux/main/install.sh | sudo bash
 ```
 
 ### Windows
@@ -24,78 +26,90 @@ curl -sSL https://raw.githubusercontent.com/BaseTechStack/basenuxt/main/install.
 1. Open PowerShell as Administrator
 2. Run:
 ```powershell
-Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/BaseTechStack/basenuxt/main/install.ps1'))
+Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/BaseTechStack/bux/main/install.ps1'))
 ```
 
 #### Option 2: Using Git Bash
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/BaseTechStack/basenuxt/main/install.sh | bash
+curl -sSL https://raw.githubusercontent.com/BaseTechStack/bux/main/install.sh | bash
 ```
 
 ## Commands
 
-### `basenuxt new <project-name>`
+### `bux new <project-name>`
 
 Create a new Nuxt.js project with the BaseNuxt framework.
 
 ```bash
-basenuxt new myapp
+bux new myapp
 ```
 
-### `basenuxt generate` or `basenuxt g`
+### `bux generate` or `bux g`
 
 Generate a new entity module with fields.
 
 ```bash
-basenuxt g <entity-name> [field:type ...] [options]
+bux g <entity-name> [field:type ...] [options]
 ```
 
-### `basenuxt start` or `basenuxt s`
+### `bux start` or `bux s`
 
-Start the BaseNuxt application server.
-
-Options:
-- `--hot-reload`, `-r`: Enable hot reloading using air
-- `--docs`, `-d`: Generate Swagger documentation
+Start the development server using Bun.
 
 Examples:
 ```bash
-# Start the server normally
-basenuxt start
+# Start the development server
+bux start
 
-# Start with hot reloading
-basenuxt start -r
-
-# Start with Swagger documentation
-basenuxt start -d
-
-# Start with both hot reloading and Swagger docs
-basenuxt start -r -d
+# Using the shorthand alias
+bux s
 ```
 
-### `basenuxt update`
+### `bux run <command>`
+
+Run any Bun script command.
+
+Examples:
+```bash
+# Build the application
+bux run build
+
+# Generate static site
+bux run generate
+
+# Run linter
+bux run lint
+
+# Run linter with auto-fix
+bux run lint:fix
+
+# Run preview server
+bux run preview
+```
+
+### `bux update`
 
 Update framework core components:
 
 ```bash
-basenuxt update
+bux update
 ```
 
-### `basenuxt upgrade`
+### `bux upgrade`
 
 Upgrade the BaseNuxt CLI tool:
 
 ```bash
-basenuxt upgrade
+bux upgrade
 ```
 
-### `basenuxt version`
+### `bux version`
 
 Display version information:
 
 ```bash
-basenuxt version
+bux version
 ```
 
 ## Entity Generation
