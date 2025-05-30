@@ -5,6 +5,29 @@ All notable changes to the BaseNuxt CLI tool will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.3.0] - 2025-05-26
+
+### Added
+- Added complete entity lifecycle management with sidebar integration
+- Added automatic sidebar navigation updates for new entities
+- Added functions to remove entities from sidebar when destroyed
+- Improved store pattern with Pinia integration
+
+### Changed
+- Changed store implementation to use composition with Pinia's defineStore
+- Updated entity-specific stores to follow consistent pattern
+- Modified components to use entity-specific naming conventions to avoid auto-import conflicts
+- Updated service implementations from singleton classes to composables
+
+### Fixed
+- Fixed prop naming consistency between different entity components
+- Fixed pluralization issues in templates by using PluralName consistently
+- Fixed import paths in components to use correct store names
+- Fixed ViewModal template to address template parsing errors
+- Fixed pagination implementation to explicitly pass page parameters
+- Fixed DeleteModal component to use v-model:open for Nuxt UI 3 compatibility
+- Fixed Pinia store initialization to prevent "getActivePinia() was called but there was no active Pinia" errors
+
 ## [v0.2.0] - 2025-04-22
 
 ### Added
