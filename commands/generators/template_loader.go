@@ -24,9 +24,11 @@ func createTemplate(name string, content []byte) (*template.Template, error) {
 	tmpl, err := template.New(name).Funcs(template.FuncMap{
 		"toLower":  ToLower,
 		"toUpper":  ToUpper,
+		"toCamel":  ToCamelCase,
 		"toPascal": ToPascalCase,
 		"toKebab":  ToKebabCase,
 		"toSnake":  ToSnakeCase,
+		"ToCamel":  ToCamelCase,
 		"ToPascal": ToPascalCase,
 		"ToKebab":  ToKebabCase,
 		"ToSnake":  ToSnakeCase,

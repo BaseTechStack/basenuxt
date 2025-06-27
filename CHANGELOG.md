@@ -10,6 +10,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Added new version release process
 
+## [v0.4.1] - 2025-06-27
+
+### Fixed
+- Fixed file naming inconsistencies across generated code
+- Added proper camelCase support for model files and imports
+- Fixed entity naming to preserve PascalCase for multi-word entities
+- Improved consistency between directory names and API endpoints
+
 ## [v0.4.0] - 2025-06-27
 
 ### Changed

@@ -4,13 +4,21 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strings"
 )
 
 // GenerateEntityStore generates the entityStore.ts file for an entity
 func GenerateEntityStore(baseDir, storesDir, entityName, pluralName string, fields []Field) error {
-	// Define the output path for the entity store file
-	outputPath := filepath.Join(storesDir, strings.ToLower(pluralName)+"Store.ts")
+	// Define the output path for the entity store file - ensure proper camelCase with capital preservation
+	// First ensure pluralName is properly capitalized in PascalCase
+	pascalPlural := ToPascalCase(pluralName)
+	// Then convert to camelCase while preserving internal capitalization
+	camelPlural := ToCamelCase(pascalPlural)
+	
+	// Log the store filename to debug
+	filename := camelPlural + "Store.ts"
+	fmt.Printf("Creating store file: %s\n", filename)
+	
+	outputPath := filepath.Join(storesDir, filename)
 
 	// Load the template from the embedded filesystem
 	templateContent, err := loadTemplate("entities_store.ts.tmpl")

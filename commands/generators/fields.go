@@ -49,27 +49,46 @@ func ParseFields(fieldStrs []string) []Field {
 	return fields
 }
 
-// PluralizeEntityName converts a singular name to its plural form
+// PluralizeEntityName converts a singular name to its plural form while preserving case
 func PluralizeEntityName(name string) string {
 	// Use the go-pluralize package for accurate pluralization
 	pluralizer := pluralize.NewClient()
 	
+	// Ensure we're working with PascalCase
+	pascalName := ToPascalCase(name)
+	
 	// If the word is already plural, return it as is
-	if pluralizer.IsPlural(name) {
-		return name
+	if pluralizer.IsPlural(pascalName) {
+		return pascalName
 	}
 	
-	// Otherwise, return the plural form
-	return pluralizer.Plural(name)
+	// Otherwise, return the plural form while preserving case
+	return pluralizer.Plural(pascalName)
 }
 
-// ToPascalCase converts a string to PascalCase
+// ToPascalCase converts a string to PascalCase while preserving internal word boundaries
 func ToPascalCase(s string) string {
 	if s == "" {
 		return ""
 	}
+	
+	// Special handling for compound PascalCase words (already in PascalCase)
+	// Detect if input is already in PascalCase format with internal caps
+	hasInternalCaps := false
+	for i, char := range s {
+		if i > 0 && i < len(s)-1 && unicode.IsUpper(char) {
+			hasInternalCaps = true
+			break
+		}
+	}
+	
+	// If it's already PascalCase with internal caps (like ProductCategory), preserve it
+	if hasInternalCaps && !strings.ContainsAny(s, "_- ") {
+		// Ensure first letter is capitalized
+		return strings.ToUpper(s[:1]) + s[1:]
+	}
 
-	// Split by common separators
+	// Otherwise split by common separators
 	words := strings.FieldsFunc(s, func(r rune) bool {
 		return r == '_' || r == '-' || r == ' '
 	})

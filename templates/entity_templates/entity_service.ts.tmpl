@@ -1,5 +1,5 @@
-import type { {{.StructName}} } from '../stores/{{.StructName | toSnake}}'
-import { {{.StructName}}Model } from '../stores/{{.StructName | toSnake}}'
+import type { {{.StructName}} } from '../stores/{{.StructName | toCamel}}'
+import { {{.StructName}}Model } from '../stores/{{.StructName | toCamel}}'
 import type { BaseService } from '@@/app/services/baseService'
 import { use{{.PluralName | toPascal}} } from '../composables/use{{.PluralName | toPascal}}'
 import type { BasePagination } from '@@/app/types/base'

@@ -9,7 +9,10 @@ import (
 // GenerateService generates the service for an entity
 func GenerateService(baseDir, servicesDir, entityName, pluralName string, fields []Field) error {
 	// Define the output path for the service
-	outputPath := filepath.Join(servicesDir, ToCamelCase(entityName)+"Service.ts")
+	// Ensure proper camelCase for service filenames
+	entityNameCamel := ToCamelCase(ToPascalCase(entityName))
+	outputPath := filepath.Join(servicesDir, entityNameCamel+"Service.ts")
+	fmt.Printf("Creating service: %sService.ts\n", entityNameCamel)
 
 	// Load the template from the embedded filesystem
 	templateContent, err := loadTemplate("entity_service.ts.tmpl")

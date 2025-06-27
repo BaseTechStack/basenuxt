@@ -4,13 +4,21 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strings"
 )
 
 // GenerateEntityType generates the entity.ts file with the TypeScript interface
 func GenerateEntityType(baseDir, storesDir, entityName, pluralName string, fields []Field) error {
 	// Define the output path for the entity type file
-	outputPath := filepath.Join(storesDir, strings.ToLower(entityName)+".ts")
+	// First ensure entityName is properly capitalized in PascalCase
+	pascalEntity := ToPascalCase(entityName)
+	// Then convert to camelCase while preserving internal capitalization
+	camelEntity := ToCamelCase(pascalEntity)
+	
+	// Log the entity filename to debug
+	filename := camelEntity + ".ts"
+	fmt.Printf("Creating entity file: %s\n", filename)
+	
+	outputPath := filepath.Join(storesDir, filename)
 
 	// Load the template from the embedded filesystem
 	templateContent, err := loadTemplate("entity.ts.tmpl")

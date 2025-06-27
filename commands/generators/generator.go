@@ -29,14 +29,33 @@ func NewGenerator(baseDir, entityName string, fieldStrs []string) *Generator {
 
 // Generate creates all entity files from templates
 func (g *Generator) Generate() error {
-	// Create the entity directory under baseDir/structures
+	// Force consistent casing for entity names
+	fmt.Println("Struct name: ", g.StructName)
+	fmt.Println("Plural name: ", g.PluralName)
+	g.StructName = ToPascalCase(g.StructName)
+	g.PluralName = ToPascalCase(PluralizeEntityName(g.StructName))
+	
+	// Debug - print both entity name and plural name to verify proper capitalization
+	fmt.Printf("Using entity name: %s\n", g.StructName)
+	fmt.Printf("Using plural name: %s\n", g.PluralName)
+
+	// Debug logging
+	fmt.Printf("Struct name: %s, Plural name: %s\n", g.StructName, g.PluralName)
+
+	// Convert plural name to kebab-case ensuring word boundaries are preserved with hyphens
+	// This ensures "ProductCategories" becomes "product-categories"
 	entityDirName := ToKebabCase(g.PluralName)
-	entityDir := filepath.Join(g.BaseDir, "structures", entityDirName)
+
+	fmt.Printf("Creating directory with kebab-case name: %s\n", entityDirName)
+	entityDir := filepath.Join(g.BaseDir, entityDirName)
+
+	fmt.Printf("Generating entity in directory: %s\n", entityDirName)
 
 	// Create subdirectories following the clients template structure
 	componentsDir := filepath.Join(entityDir, "components")
 	composablesDir := filepath.Join(entityDir, "composables")
 	pagesDir := filepath.Join(entityDir, "pages")
+	pagesSingleDir := filepath.Join(entityDir, "pages", "[id]")
 	storesDir := filepath.Join(entityDir, "stores")
 	servicesDir := filepath.Join(entityDir, "services")
 
@@ -46,6 +65,7 @@ func (g *Generator) Generate() error {
 		componentsDir,
 		composablesDir,
 		pagesDir,
+		pagesSingleDir,
 		storesDir,
 		servicesDir,
 	}

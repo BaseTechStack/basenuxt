@@ -9,7 +9,10 @@ import (
 // GenerateComposable generates the composable for an entity
 func GenerateComposable(baseDir, composablesDir, entityName, pluralName string, fields []Field) error {
 	// Define the output path for the composable
-	outputPath := filepath.Join(composablesDir, "use"+ToPascalCase(pluralName)+".ts")
+	// Preserve proper capitalization for multi-word entities by ensuring PascalCase
+	pascalPluralName := ToPascalCase(pluralName)
+	outputPath := filepath.Join(composablesDir, "use"+pascalPluralName+".ts")
+	fmt.Printf("Creating composable: use%s.ts\n", pascalPluralName)
 
 	// Load the template from the embedded filesystem
 	templateContent, err := loadTemplate("use_entities.ts.tmpl")
