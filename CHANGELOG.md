@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [v0.5.0] - 2025-06-27
+## [v0.4.1] - 2025-06-27
 
 ### Changed
 - Improved directory structure generation to place entities under a 'structures' directory
