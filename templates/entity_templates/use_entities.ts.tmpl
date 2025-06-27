@@ -7,7 +7,7 @@ export const use{{.PluralName | toPascal}} = () => {
 
   const fetch{{.PluralName | toPascal}} = async (page = 1, pageSize = 10) => {
     console.log('use{{.PluralName | toPascal}}.fetch{{.PluralName | toPascal}} called with page:', page, 'pageSize:', pageSize)
-    const result = await api.get(`/{{.PluralName | toLower}}?page=${page}&limit=${pageSize}`)
+    const result = await api.get(`/{{.PluralName | toKebab}}?page=${page}&limit=${pageSize}`)
     console.log('use{{.PluralName | toPascal}} API response:', result)
     const total = result.pagination?.total || 0
     const pagination: BasePagination = {
@@ -21,22 +21,22 @@ export const use{{.PluralName | toPascal}} = () => {
   }
 
   const fetch{{.StructName | toPascal}}ById = async (id: number) => {
-    const result = await api.get(`/{{.PluralName | toLower}}/${id}`)
+    const result = await api.get(`/{{.PluralName | toKebab}}/${id}`)
     return { {{.StructName | toLower}}: result.data }
   }
 
   const create{{.StructName | toPascal}} = async ({{.StructName | toLower}}Data: Omit<{{.StructName}}, 'id'>) => {
-    const result = await api.post('/{{.PluralName | toLower}}', {{.StructName | toLower}}Data)
+    const result = await api.post('/{{.PluralName | toKebab}}', {{.StructName | toLower}}Data)
     return { {{.StructName | toLower}}: result.data }
   }
 
   const update{{.StructName}} = async (id: number, {{.StructName | toLower}}Data: Partial<Omit<{{.StructName}}, 'id'>>) => {
-    const result = await api.put(`/{{.PluralName | toLower}}/${id}`, {{.StructName | toLower}}Data)
+    const result = await api.put(`/{{.PluralName | toKebab}}/${id}`, {{.StructName | toLower}}Data)
     return { {{.StructName | toLower}}: result.data }
   }
 
   const delete{{.StructName}} = async (id: number) => {
-    await api.delete(`/{{.PluralName | toLower}}/${id}`)
+    await api.delete(`/{{.PluralName | toKebab}}/${id}`)
   }
 
   return {

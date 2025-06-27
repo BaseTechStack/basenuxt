@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Added new version release process
+
+## [v0.4.0] - 2025-06-27
+
+### Changed
+- Standardized API endpoint format to consistently use kebab-case plural naming
+- Fixed inconsistent templates that mixed toLower and toKebab for API endpoints
+- Ensured consistent code generation for models, services, and stores
+- Simplified API endpoint generation for product structure
+- Improved entity code pattern following Nuxt/Vue/TypeScript conventions
+
+### Fixed
+- Fixed API endpoint format inconsistencies in templates
+- Fixed incorrect template function reference
+
+## [v0.3.1] - 2025-06-10
+
 ### Changed
 - Renamed command from `basenuxt` to `bux` (BaseUX) with backward compatibility
 - Added deprecation notice when using the old `basenuxt` command name
