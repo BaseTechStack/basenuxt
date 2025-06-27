@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v0.5.0] - 2025-06-27
+
+### Changed
+- Improved directory structure generation to place entities under a 'structures' directory
+- Fixed single page generator to correctly create pages in [id]/index.vue format
+- Updated import paths in templates to reference files from the structures directory
+- Improved template rendering with proper Vue template syntax escaping
+- Enhanced button styling in single entity page templates
+
+### Fixed
+- Fixed Vue template syntax issues with double curly braces in Go templates
+- Fixed JSONName field access in templates to properly access entity properties
+- Fixed Edit component references in page templates
+- Improved compatibility with Nuxt UI component styling
+
 ## [v0.4.2] - 2025-06-27
 
 ### Fixed
