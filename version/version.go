@@ -12,7 +12,7 @@ import (
 // Version information
 var (
 	// Version is the current version of BaseUX (bux) CLI
-	Version = "0.5.0"
+	Version = "0.4.1"
 
 	// CommitHash is the git commit hash at build time
 	CommitHash = "unknown"
