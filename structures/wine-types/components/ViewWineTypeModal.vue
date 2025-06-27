@@ -1,25 +1,25 @@
 <template>
   <USlideover
     v-model:open="isOpen"
-    title="View {{.StructName | toPascal}}"
-    description="View the details of this {{.StructName | toPascal}}."
+    title="View WineType"
+    description="View the details of this WineType."
   >
 
     <template #body>
       <div class="space-y-6 p-4">
         <div v-for="field in fields" :key="field.label" class="space-y-1">
-          <div class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ "{{" }} field.label {{ "}}" }}</div>
-          <div>{{ "{{" }} field.value {{ "}}" }}</div>
+          <div class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ field.label }}</div>
+          <div>{{ field.value }}</div>
         </div>
         
         <div v-if="item" class="space-y-1">
           <div class="text-sm font-medium text-gray-500 dark:text-gray-400">Created</div>
-          <div>{{ "{{" }} formatDate(item.createdAt) {{ "}}" }}</div>
+          <div>{{ formatDate(item.createdAt) }}</div>
         </div>
         
         <div v-if="item" class="space-y-1">
           <div class="text-sm font-medium text-gray-500 dark:text-gray-400">Updated</div>
-          <div>{{ "{{" }} formatDate(item.updatedAt) {{ "}}" }}</div>
+          <div>{{ formatDate(item.updatedAt) }}</div>
         </div>
       </div>
     </template>
@@ -41,9 +41,9 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import { format } from 'date-fns'
-import { use{{.PluralName | toPascal}}Store } from '../stores/{{.PluralName | toCamel}}Store'
-import type { {{.StructName | toPascal}} } from '../stores/{{.StructName | toCamel}}'
-import { {{.StructName | toPascal}}Model } from '../stores/{{.StructName | toCamel}}'
+import { useWineTypesStore } from '../stores/winetypesStore'
+import type { WineType } from '../stores/winetype'
+import { WineTypeModel } from '../stores/winetype'
 
 const formatDate = (dateString?: string) => {
   if (!dateString) return 'N/A'
@@ -54,11 +54,11 @@ const formatDate = (dateString?: string) => {
   }
 }
 
-const {{.PluralName | toLower}}Store = use{{.PluralName | toPascal}}Store()
+const winetypesStore = useWineTypesStore()
 
 const props = defineProps<{
   open?: boolean
-  {{.StructName | toLower}}?: {{.StructName | toPascal}}
+  winetype?: WineType
   title?: string
 }>()
 
@@ -78,31 +78,46 @@ const isOpen = computed({
 
 // No need for a computed title as we're using a hardcoded one
 
-const item = ref<{{.StructName | toPascal}} | null>(null)
+const item = ref<WineType | null>(null)
 const fields = ref<{label: string, value: any}[]>([])
 
 const populateFields = () => {
   if (!item.value) return
   
   fields.value = [
-    {{range .Fields}}
+    
     { 
-      label: '{{.Name | ToPascal}}', 
-      value: item.value.{{.JSONName}}
+      label: 'Name', 
+      value: item.value.name
     },
-    {{end}}
+    
+    { 
+      label: 'Description', 
+      value: item.value.description
+    },
+    
+    { 
+      label: 'Category', 
+      value: item.value.category
+    },
+    
   ]
 }
 
 const fetchData = () => {
-  if (props.{{.StructName | toLower}}) {
-    item.value = props.{{.StructName | toLower}}
+  if (props.winetype) {
+    // Convert the raw data to a proper model instance if needed
+    if (props.winetype.created_at && !props.winetype.createdAt) {
+      item.value = WineTypeModel.fromJson(props.winetype as any)
+    } else {
+      item.value = props.winetype
+    }
     populateFields()
   }
 }
 
 watch(isOpen, (newVal) => {
-  if (newVal && props.{{.StructName | toLower}}) {
+  if (newVal && props.winetype) {
     fetchData()
   } else {
     item.value = null
@@ -110,7 +125,7 @@ watch(isOpen, (newVal) => {
   }
 })
 
-watch(() => props.{{.StructName | toLower}}, (newVal) => {
+watch(() => props.winetype, (newVal) => {
   if (isOpen.value && newVal) {
     fetchData()
   }

@@ -1,10 +1,10 @@
 <template>
-  <UModal v-model:open="isOpen" title="Are you sure?" description="You are about to delete this {{.VarName}}." :ui="{ footer: 'justify-end ', content: 'text-white dark:text-white bg-red-500 dark:bg-red-900', }">
+  <UModal v-model:open="isOpen" title="Are you sure?" description="You are about to delete this winetype." :ui="{ footer: 'justify-end ', content: 'text-white dark:text-white bg-red-500 dark:bg-red-900', }">
  
     <template #body>
       <div class="space-y-1">
         <div class="text-sm font-medium text-white dark:text-white">Name</div>
-        <div>{{ "{{" }} {{.VarName}}?.name {{ "}}" }}</div>
+        <div>{{ winetype?.name }}</div>
       </div>
  
     </template>
@@ -18,11 +18,11 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import type { {{.StructName}} } from '../stores/{{.StructName | toCamel}}'
+import type { WineType } from '../stores/winetype'
 
 const props = defineProps<{
   open?: boolean
-  {{.VarName}}?: {{.StructName}}
+  winetype?: WineType
   loading?: boolean
 }>()
 

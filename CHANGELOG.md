@@ -7,6 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v0.4.2] - 2025-06-27
+
+### Fixed
+- Fixed BaseService interface missing `fetchById` method causing TypeScript errors
+- Fixed illogical conditional in ViewModal template (`props.entity.createdAt && !props.entity.createdAt`)
+- Fixed function signature mismatch in handleUpdate (EditModal vs page component expectations)
+- Fixed import path casing issues in all component templates (now uses proper camelCase)
+- Simplified type casting in store.create calls with proper Omit types
+- Fixed service method calls to properly destructure response objects (`result.item`)
+
+### Improved
+- Simplified ViewModal template logic by removing unnecessary conditional complexity
+- Enhanced template consistency across all generated components
+- Improved TypeScript compatibility with cleaner type definitions
+- Generated code now follows core @admin/app/ architecture patterns
+
+### Templates Updated
+- `view_modal.vue.tmpl` - Simplified fetchData logic
+- `page_id.vue.tmpl` - Fixed handleUpdate signature and service response handling  
+- `page_index.vue.tmpl` - Added proper type casting for store operations
+- `edit_modal.vue.tmpl`, `add_modal.vue.tmpl`, `table.vue.tmpl`, `grid.vue.tmpl` - Fixed import casing
+- `entity_service.ts.tmpl` - Enhanced service response handling
+
 ### Added
 - Added new version release process
 

@@ -2,7 +2,7 @@
   <div>
     <div class="p-4">
       <div class="flex justify-between items-center mb-6">
-        <h1 class="text-2xl font-bold">{{.PluralName | toPascal}}</h1>
+        <h1 class="text-2xl font-bold">WineTypes</h1>
         <div class="flex items-center gap-4">
           <div class="flex items-center space-x-2">
             <UButtonGroup size="xl" class="border border-gray-200 dark:border-gray-800 rounded-md">
@@ -28,7 +28,7 @@
             icon="i-heroicons-plus"
             @click="modalState.add.isOpen = true"
           >
-            Add {{.StructName | toPascal}}
+            Add WineType
           </UButton>
         </div>
       </div>
@@ -50,58 +50,58 @@
         />
       </div>
       <!-- Page Content -->
-      <{{.StructName}}Grid 
+      <WineTypeGrid 
         v-if="store.viewMode === 'grid' && store.items.length > 0" 
-        :{{.StructName | toLower}}="store.items" 
-        @edit="edit{{.StructName}}" 
-        @delete="delete{{.StructName}}" 
-        @view="view{{.StructName}}"
+        :winetype="store.items" 
+        @edit="editWineType" 
+        @delete="deleteWineType" 
+        @view="viewWineType"
         :current-page="store.pagination.page"
         :page-size="store.pagination.pageSize"
       />
-      <{{.StructName}}Table 
+      <WineTypeTable 
         v-else-if="store.viewMode === 'table' && store.items.length > 0"
-        :{{.StructName | toLower}}="store.items" 
-        @edit="edit{{.StructName}}" 
-        @delete="delete{{.StructName}}" 
-        @view="view{{.StructName}}"
+        :winetype="store.items" 
+        @edit="editWineType" 
+        @delete="deleteWineType" 
+        @view="viewWineType"
         :current-page="store.pagination.page"
         :page-size="store.pagination.pageSize"
       />
 
       <!-- Empty State -->
       <div v-if="store.items.length === 0" class="text-center py-12">
-        <h3 class="mt-4 text-lg font-medium text-gray-900">No {{.PluralName | toPascal}}</h3>
-        <p class="mt-1 text-sm text-gray-500">Get started by creating a new {{.StructName | toLower}}.</p>
+        <h3 class="mt-4 text-lg font-medium text-gray-900">No WineTypes</h3>
+        <p class="mt-1 text-sm text-gray-500">Get started by creating a new winetype.</p>
         <div class="mt-6">
           <UButton color="primary" @click="modalState.add.isOpen = true">
-            Add {{.StructName | toPascal}}
+            Add WineType
           </UButton>
         </div>
       </div>
     </div>
 
     <!-- Modals -->
-    <Add{{.StructName}}Modal
+    <AddWineTypeModal
       v-model="modalState.add.isOpen" 
-      @{{.StructName | toLower}}-added="handle{{.StructName}}Added"
+      @winetype-added="handleWineTypeAdded"
     />
     
-    <Edit{{.StructName}}Modal
+    <EditWineTypeModal
       v-model:open="modalState.edit.isOpen" 
-      :{{.StructName | toLower}}="modalState.edit.{{.StructName | toLower}}"
+      :winetype="modalState.edit.winetype"
       :loading="modalState.edit.loading"
       @submit="handleEditSubmit"
     />
     
-    <View{{.StructName}}Modal
+    <ViewWineTypeModal
       v-model:open="modalState.view.isOpen" 
-      :{{.StructName | toLower}}="modalState.view.{{.StructName | toLower}}"
+      :winetype="modalState.view.winetype"
     />
     
-    <Delete{{.StructName}}Modal
+    <DeleteWineTypeModal
       v-model:open="modalState.delete.isOpen" 
-      :{{.StructName | toLower}}="modalState.delete.{{.StructName | toLower}}"
+      :winetype="modalState.delete.winetype"
       :loading="modalState.delete.loading"
       @confirm="confirmDelete"
     />
@@ -110,8 +110,8 @@
 
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
-import { use{{.PluralName | toPascal}}Store } from '../../stores/{{.PluralName | toCamel}}Store'
-import type { {{.StructName | toPascal}} } from '../../stores/{{.StructName | toCamel}}'
+import { useWineTypesStore } from '../../stores/winetypesStore'
+import type { WineType } from '../../stores/winetype'
 import { format } from 'date-fns'
 
 interface ModalState {
@@ -121,21 +121,21 @@ interface ModalState {
   }
   edit: {
     isOpen: boolean
-    {{.StructName | toLower}}?: {{.StructName | toPascal}}
+    winetype?: WineType
     loading?: boolean
   }
   view: {
     isOpen: boolean
-    {{.StructName | toLower}}?: {{.StructName | toPascal}}
+    winetype?: WineType
   }
   delete: {
     isOpen: boolean
-    {{.StructName | toLower}}?: {{.StructName | toPascal}}
+    winetype?: WineType
     loading?: boolean
   }
 }
 
-const store = use{{.PluralName | toPascal}}Store()
+const store = useWineTypesStore()
 
 const modalState = ref<ModalState>({
   add: { isOpen: false },
@@ -157,33 +157,33 @@ function formatDate(dateString: string) {
   }
 } 
 
-function edit{{.StructName}}({{.StructName | toLower}}: {{.StructName | toPascal}}) {
-  modalState.value.edit.{{.StructName | toLower}} = {{.StructName | toLower}}
+function editWineType(winetype: WineType) {
+  modalState.value.edit.winetype = winetype
   modalState.value.edit.isOpen = true
 }
 
-function view{{.StructName}}({{.StructName | toLower}}: {{.StructName | toPascal}}) {
-  modalState.value.view.{{.StructName | toLower}} = {{.StructName | toLower}}
+function viewWineType(winetype: WineType) {
+  modalState.value.view.winetype = winetype
   modalState.value.view.isOpen = true
 }
 
-function delete{{.StructName}}({{.StructName | toLower}}: {{.StructName | toPascal}}) {
-  modalState.value.delete.{{.StructName | toLower}} = {{.StructName | toLower}}
+function deleteWineType(winetype: WineType) {
+  modalState.value.delete.winetype = winetype
   modalState.value.delete.isOpen = true
 }
 
 function switchViewToEdit() {
-  const {{.StructName | toLower}} = modalState.value.view.{{.StructName | toLower}}
+  const winetype = modalState.value.view.winetype
   closeModal('view')
-  if ({{.StructName | toLower}}) {
-    edit{{.StructName}}({{.StructName | toLower}})
+  if (winetype) {
+    editWineType(winetype)
   }
 }
 
 function closeModal(type: 'add' | 'edit' | 'view') {
   modalState.value[type].isOpen = false
   if (type === 'edit' || type === 'view') {
-    modalState.value[type].{{.StructName | toLower}} = undefined
+    modalState.value[type].winetype = undefined
   }
 }
 
@@ -211,25 +211,25 @@ function getPageSizeOptions() {
   return commonOptions
 }
 
-async function handle{{.StructName}}Added(data: Partial<{{.StructName | toPascal}}>) {
+async function handleWineTypeAdded(data: Partial<WineType>) {
   modalState.value.add.loading = true
   try {
-    await store.create(data as Omit<{{.StructName | toPascal}}, 'id'>)
+    await store.create(data)
     modalState.value.add.isOpen = false
   } catch (error) {
-    console.error('Error adding {{.StructName | toLower}}:', error)
+    console.error('Error adding winetype:', error)
   } finally {
     modalState.value.add.loading = false
   }
 }
 
-async function handleEditSubmit(id: number, data: Partial<{{.StructName | toPascal}}>) {
+async function handleEditSubmit(id: number, data: Partial<WineType>) {
   modalState.value.edit.loading = true
   try {
     await store.update(id, data)
     modalState.value.edit.isOpen = false
   } catch (error) {
-    console.error('Error updating {{.StructName | toLower}}:', error)
+    console.error('Error updating winetype:', error)
   } finally {
     modalState.value.edit.loading = false
   }
@@ -241,7 +241,7 @@ async function confirmDelete(id: number) {
     await store.delete(id)
     modalState.value.delete.isOpen = false
   } catch (error) {
-    console.error('Error deleting {{.StructName | toLower}}:', error)
+    console.error('Error deleting winetype:', error)
   } finally {
     modalState.value.delete.loading = false
   }

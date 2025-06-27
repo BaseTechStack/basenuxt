@@ -41,7 +41,7 @@
 </template>
 
 <script setup lang="ts">
-import type { {{.StructName}} } from '../stores/{{.StructName | toLower}}'
+import type { {{.StructName}} } from '../stores/{{.StructName | toCamel}}'
 import { computed } from 'vue'
 
 const props = defineProps<{

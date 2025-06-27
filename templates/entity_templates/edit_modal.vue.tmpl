@@ -53,7 +53,7 @@
 
 <script setup lang="ts">
 import { ref, computed, reactive, watch } from 'vue'
-import type { {{.StructName}} } from '../stores/{{.StructName | toLower}}'
+import type { {{.StructName}} } from '../stores/{{.StructName | toCamel}}'
 
 const props = defineProps<{
   open?: boolean

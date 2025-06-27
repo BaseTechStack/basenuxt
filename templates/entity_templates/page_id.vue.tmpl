@@ -1,8 +1,8 @@
 <template>
-  <div class="{{.StructName | toLower}}-detail-container">
-    <header class="{{.StructName | toLower}}-detail-header p-4 flex justify-between items-center mb-6">
+  <div class="{{.StructName | toKebab}}-detail-container">
+    <header class="{{.StructName | toKebab}}-detail-header p-4 flex justify-between items-center mb-6">
       <div class="flex items-center">
-        <NuxtLink :to="`/{{.PluralName | toLower}}`" class="back-link">
+        <NuxtLink :to="`/{{.PluralName | toKebab}}`" class="back-link">
           <UButton
             color="neutral"
             variant="ghost"
@@ -11,12 +11,12 @@
             Back to {{.PluralName}}
           </UButton>
         </NuxtLink>
-        <h1 class="text-2xl font-bold ml-4">{{ {{.StructName | toLower}} ? {{.StructName | toLower}}.{{index .Fields 0 | .JSONName}} : 'Loading {{.StructName | toLower}}...' }}</h1>
+        <h1 class="text-2xl font-bold ml-4">{{ "{{" }} {{.StructName | toCamel}} ? {{.StructName | toCamel}}.{{(index .Fields 0).JSONName}} : 'Loading {{.StructName}}...' {{ "}}" }}</h1>
       </div>
       
-      <div v-if="{{.StructName | toLower}}" class="flex items-center space-x-2">
+      <div v-if="{{.StructName | toCamel}}" class="flex items-center space-x-2">
         <UButton
-          color="primary"
+          color="success"
           icon="i-heroicons-pencil-square"
           @click="isEditing = true"
           v-if="!isEditing"
@@ -24,7 +24,8 @@
           Edit
         </UButton>
         <UButton
-          color="red"
+          color="error"
+          variant="ghost"
           icon="i-heroicons-trash"
           @click="showDeleteConfirm = true"
           v-if="!isEditing"
@@ -32,14 +33,16 @@
           Delete
         </UButton>
         <UButton
-          color="gray"
+          color="neutral"
+          variant="ghost"
+          icon="i-heroicons-x-mark-20-solid"
           @click="isEditing = false"
           v-if="isEditing"
         >
           Cancel
         </UButton>
         <UButton
-          color="primary"
+          color="success"
           icon="i-heroicons-check"
           @click="saveChanges"
           v-if="isEditing"
@@ -52,7 +55,7 @@
 
     <div v-if="loading" class="flex flex-col items-center justify-center p-12">
       <ULoading />
-      <p class="mt-4 text-gray-500">Loading {{.StructName | toLower}}...</p>
+      <p class="mt-4 text-gray-500">Loading {{.StructName}}...</p>
     </div>
 
     <div v-else-if="error" class="p-4">
@@ -63,40 +66,45 @@
         icon="i-lucide-alert-triangle"
       >
         <template #description>
-          {{ error }}
+          {{ "{{" }} error {{ "}}" }}
         </template>
       </UAlert>
     </div>
 
-    <div v-else-if="{{.StructName | toLower}}" class="p-4">
-      <UCard v-if="!isEditing" class="{{.StructName | toLower}}-detail">
+    <div v-else-if="{{.StructName | toCamel}}" class="p-4">
+      <UCard v-if="!isEditing" class="{{.StructName | toKebab}}-detail">
         <template #header>
-          <div class="{{.StructName | toLower}}-meta flex space-x-2">
-            <UBadge color="neutral" variant="soft">
-              ID: {{ {{.StructName | toLower}}.id }}
-            </UBadge>
-            <UBadge color="primary" variant="soft">
-              Created: {{ formatDate({{.StructName | toLower}}.createdAt) }}
-            </UBadge>
-            <UBadge color="primary" variant="soft">
-              Updated: {{ formatDate({{.StructName | toLower}}.updatedAt) }}
-            </UBadge>
+          <div class="flex items-center justify-between">
+            <h3 class="text-lg font-semibold">{{.StructName}} Details</h3>
+            <div class="{{.StructName | toKebab}}-meta flex space-x-2">
+              <UBadge color="neutral" variant="soft" class="text-xs">
+                ID: {{ "{{" }} {{.StructName | toCamel}}.id {{ "}}" }}
+              </UBadge>
+              <UBadge color="primary" variant="soft" class="text-xs">
+                Created: {{ "{{" }} formatDate({{.StructName | toCamel}}.createdAt) {{ "}}" }}
+              </UBadge>
+              <UBadge color="primary" variant="soft" class="text-xs">
+                Updated: {{ "{{" }} formatDate({{.StructName | toCamel}}.updatedAt) {{ "}}" }}
+              </UBadge>
+            </div>
           </div>
         </template>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 py-4">
           {{range .Fields}}
-          <div>
-            <h3 class="text-sm font-medium text-gray-500">{{.JSONName | toPascal}}</h3>
-            <p class="mt-1 text-lg">{{ {{$.StructName | toLower}}.{{.JSONName}} }}</p>
-          </div>
+          <UCard class="field-card">
+            <div class="flex flex-col">
+              <div class="text-sm font-medium text-gray-500">{{.JSONName | toPascal}}</div>
+              <div class="mt-1 font-medium">{{ "{{" }} {{$.StructName | toCamel}}.{{.JSONName}} || '-' {{ "}}" }}</div>
+            </div>
+          </UCard>
           {{end}}
         </div>
       </UCard>
 
-      <Form{{.StructName}} 
+      <Edit{{.StructName}} 
         v-else 
-        :{{.StructName | toLower}}="{{.StructName | toLower}}" 
+        :{{.StructName | toCamel}}="{{.StructName | toCamel}}" 
         :loading="saving"
         @submit="handleUpdate"
       />
@@ -104,14 +112,14 @@
 
     <!-- Delete Confirmation Dialog -->
     <UModal v-model="showDeleteConfirm">
-      <UCard :ui="{ divide: 'divide-y divide-gray-100 dark:divide-gray-800' }">
+      <UCard>
         <template #header>
           <div class="flex items-center justify-between">
             <h3 class="text-base font-semibold leading-6 text-gray-900 dark:text-white">
               Delete {{.StructName}}
             </h3>
             <UButton
-              color="gray"
+              color="neutral"
               variant="ghost"
               icon="i-heroicons-x-mark-20-solid"
               class="-my-1"
@@ -130,15 +138,15 @@
           <div class="flex justify-end gap-x-4">
             <UButton
               label="Cancel"
-              color="gray"
-              variant="solid"
+              color="neutral"
+              variant="ghost"
               @click="showDeleteConfirm = false"
             />
             <UButton
               label="Delete"
-              color="red"
+              color="error"
               :loading="deleting"
-              @click="confirmDelete"
+              @click="deleteItem"
             />
           </div>
         </template>
@@ -148,43 +156,39 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { use{{.PluralName}}Store } from '../../stores/{{.StructName | toLower}}Store'
-import type { {{.StructName}} } from '../../stores/{{.StructName | toLower}}'
 import { format } from 'date-fns'
+import type { {{.StructName}} } from '@@/structures/{{.PluralName | toKebab}}/stores/{{.StructName | toCamel}}'
+import { use{{.StructName}}Service } from '@@/structures/{{.PluralName | toKebab}}/services/{{.StructName | toCamel}}Service'
+import { use{{.PluralName}}Store } from '@@/structures/{{.PluralName | toKebab}}/stores/{{.PluralName | toCamel}}Store'
+import Edit{{.StructName}} from '@@/structures/{{.PluralName | toKebab}}/components/Edit{{.StructName}}Modal.vue'
 
 const route = useRoute()
-const router = useRouter()
-const store = use{{.PluralName}}Store()
+const id = computed(() => String(route.params.id))
+const {{.StructName | toCamel}}Service = use{{.StructName}}Service()
+const {{.PluralName | toCamel}}Store = use{{.PluralName}}Store()
 
-const {{.StructName | toLower}} = ref<{{.StructName}} | null>(null)
+const {{.StructName | toCamel}} = ref<{{.StructName}} | null>(null)
 const loading = ref(true)
-const error = ref<string | null>(null)
+const error = ref('')
 const isEditing = ref(false)
 const saving = ref(false)
-const deleting = ref(false)
 const showDeleteConfirm = ref(false)
+const deleting = ref(false)
 
 onMounted(async () => {
-  const id = route.params.id as string
-  if (!id) {
-    error.value = 'No {{.StructName | toLower}} ID provided'
-    loading.value = false
-    return
-  }
-
   try {
-    const result = await store.fetch{{.StructName}}(id)
-    if (result) {
-      {{.StructName | toLower}}.value = result
-    } else {
-      error.value = '{{.StructName}} not found'
+    const itemId = route.params.id
+    if (!itemId) {
+      error.value = 'No {{.StructName}} ID provided'
+      loading.value = false
+      return
     }
-  } catch (err) {
-    console.error('Error fetching {{.StructName | toLower}}:', err)
-    error.value = 'Error loading {{.StructName | toLower}}'
-  } finally {
+
+    const result = await {{.StructName | toCamel}}Service.fetchById(Number(itemId))
+    {{.StructName | toCamel}}.value = result.item
+    loading.value = false
+  } catch (e: any) {
+    error.value = `Error loading {{.StructName}}: ${e?.message || 'Unknown error'}`
     loading.value = false
   }
 })
@@ -197,44 +201,54 @@ function formatDate(dateString: string) {
   }
 }
 
-async function handleUpdate(data: Omit<{{.StructName}}, 'id' | 'createdAt' | 'updatedAt'>) {
-  if (!{{.StructName | toLower}}.value) return
+async function handleUpdate(id: number, data: Partial<{{.StructName}}>) {
+  if (!{{.StructName | toCamel}}.value) return
   
   saving.value = true
   try {
-    const updatedItem = await store.update{{.StructName}}({
-      id: {{.StructName | toLower}}.value.id,
-      ...data
-    })
+    await {{.StructName | toCamel}}Service.update(id, data)
     
-    if (updatedItem) {
-      {{.StructName | toLower}}.value = updatedItem
-      isEditing.value = false
-    }
-  } catch (err) {
-    console.error('Error updating {{.StructName | toLower}}:', err)
-    // Show error notification
+    // Fetch the updated entity
+    const result = await {{.StructName | toCamel}}Service.fetchById({{.StructName | toCamel}}.value.id)
+    {{.StructName | toCamel}}.value = result.item
+    isEditing.value = false
+  } catch (e: any) {
+    error.value = `Error updating {{.StructName}}: ${e?.message || 'Unknown error'}`
   } finally {
     saving.value = false
   }
 }
 
-function saveChanges() {
-  // Form component will handle the submission
+async function saveChanges() {
+  if (!{{.StructName | toCamel}}.value) return
+  
+  saving.value = true
+  try {
+    await {{.StructName | toCamel}}Service.update({{.StructName | toCamel}}.value.id, {{.StructName | toCamel}}.value)
+    isEditing.value = false
+    // Refresh data
+    const result = await {{.StructName | toCamel}}Service.fetchById({{.StructName | toCamel}}.value.id)
+    {{.StructName | toCamel}}.value = result.item
+  } catch (e: any) {
+    error.value = `Error updating {{.StructName}}: ${e?.message || 'Unknown error'}`
+  } finally {
+    saving.value = false
+  }
 }
 
-async function confirmDelete() {
-  if (!{{.StructName | toLower}}.value) return
+async function deleteItem() {
+  if (!{{.StructName | toCamel}}.value) return
   
-  deleting.value = true
+  deleting.value = true;
   try {
-    await store.delete{{.StructName}}({{.StructName | toLower}}.value.id)
-    router.push('/{{.PluralName | toLower}}')
-  } catch (err) {
-    console.error('Error deleting {{.StructName | toLower}}:', err)
+    await {{.StructName | toCamel}}Service.delete({{.StructName | toCamel}}.value.id)
+    // Navigate back to listing page
+    navigateTo(`/structures/{{.PluralName | toKebab}}`)
+  } catch (e: any) {
+    error.value = `Error deleting {{.StructName}}: ${e?.message || 'Unknown error'}`
     showDeleteConfirm.value = false
   } finally {
-    deleting.value = false
+    deleting.value = false;
   }
 }
 </script>

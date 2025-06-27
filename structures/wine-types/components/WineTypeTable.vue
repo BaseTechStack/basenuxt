@@ -9,24 +9,24 @@
         <UInput
           v-model="search"
           icon="i-heroicons-magnifying-glass"
-          placeholder="Search {{.PluralName | toLower}}..."
+          placeholder="Search winetypes..."
           size="sm"
           class="max-w-sm"
         />
       </div>
       
-      <UTable :data="{{.PluralName | toLower}}" :columns="columns" />
+      <UTable :data="winetypes" :columns="columns" />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import type { {{.StructName | toPascal}} } from '../stores/{{.StructName | toCamel}}'
+import type { WineType } from '../stores/winetype'
 import { ref, h, resolveComponent, computed } from 'vue'
 import type { TableColumn } from '#imports'
 
 interface Props {
-  {{.StructName | toLower}}: {{.StructName | toPascal}}[]
+  winetype: WineType[]
   loading?: boolean
   error?: string | null
 }
@@ -37,26 +37,36 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const emit = defineEmits<{
-  (e: 'edit', {{.StructName | toLower}}: {{.StructName | toPascal}}): void
-  (e: 'delete', {{.StructName | toLower}}: {{.StructName | toPascal}}): void
-  (e: 'view', {{.StructName | toLower}}: {{.StructName | toPascal}}): void
+  (e: 'edit', winetype: WineType): void
+  (e: 'delete', winetype: WineType): void
+  (e: 'view', winetype: WineType): void
 }>()
 
 const search = ref('')
 
-const {{.PluralName | toLower}} = computed(() => props.{{.StructName | toLower}})
+const winetypes = computed(() => props.winetype)
 
-const columns: TableColumn<{{.StructName | toPascal}}>[] = [
+const columns: TableColumn<WineType>[] = [
   {
     accessorKey: 'id',
     header: 'ID'
   },
-  {{range .Fields}}
+  
   {
-    accessorKey: '{{.JSONName}}',
-    header: '{{.JSONName | toPascal}}'
+    accessorKey: 'name',
+    header: 'Name'
   },
-  {{end}}
+  
+  {
+    accessorKey: 'description',
+    header: 'Description'
+  },
+  
+  {
+    accessorKey: 'category',
+    header: 'Category'
+  },
+  
   {
     accessorKey: 'createdAt',
     header: 'Created'
@@ -70,21 +80,21 @@ const columns: TableColumn<{{.StructName | toPascal}}>[] = [
         variant: 'ghost',
         icon: 'i-heroicons-eye',
         size: 'xs',
-        onClick: () => emit('view', row as unknown as {{.StructName | toPascal}})
+        onClick: () => emit('view', row as unknown as WineType)
       }),
       h(resolveComponent('UButton'), {
         color: 'primary',
         variant: 'ghost',
         icon: 'i-heroicons-pencil-square',
         size: 'xs',
-        onClick: () => emit('edit', row as unknown as {{.StructName | toPascal}})
+        onClick: () => emit('edit', row as unknown as WineType)
       }),
       h(resolveComponent('UButton'), {
         color: 'red',
         variant: 'ghost',
         icon: 'i-heroicons-trash',
         size: 'xs',
-        onClick: () => emit('delete', row as unknown as {{.StructName | toPascal}})
+        onClick: () => emit('delete', row as unknown as WineType)
       })
     ])
   }

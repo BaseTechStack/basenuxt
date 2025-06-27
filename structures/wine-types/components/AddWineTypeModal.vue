@@ -1,25 +1,43 @@
 <template>
   <UModal 
     v-model:open="isOpen" 
-    :title="title || 'New {{.StructName}}'"
-    :description="description || 'Add a new {{.StructName | toLower}} to your system'"
+    :title="title || 'New WineType'"
+    :description="description || 'Add a new winetype to your system'"
   >
     <template #body>
       <form @submit.prevent="handleSubmit">
         <div class="space-y-4">
-          {{range .Fields}}
-          <UFormField label="{{.Name | ToPascal}}" {{if .IsRequired}}required{{end}}>
-            {{if eq .Type "boolean"}}
-            <UCheckbox v-model="formData.{{.JSONName}}" {{if .IsRequired}}required{{end}} />
-            {{else}}
+          
+          <UFormField label="Name" >
+            
             <UInput 
-              v-model="formData.{{.JSONName}}" 
-              {{if .IsRequired}}required{{end}} 
-              {{if eq .Type "number"}}type="number"{{else}}type="text"{{end}}
+              v-model="formData.name" 
+               
+              type="text"
             />
-            {{end}}
+            
           </UFormField>
-          {{end}}
+          
+          <UFormField label="Description" >
+            
+            <UInput 
+              v-model="formData.description" 
+               
+              type="text"
+            />
+            
+          </UFormField>
+          
+          <UFormField label="Category" >
+            
+            <UInput 
+              v-model="formData.category" 
+               
+              type="text"
+            />
+            
+          </UFormField>
+          
         </div>
       </form>
     </template>
@@ -47,7 +65,7 @@
 
 <script setup lang="ts">
 import { ref, computed, reactive } from 'vue'
-import type { {{.StructName}} } from '../stores/{{.StructName | toCamel}}'
+import type { WineType } from '../stores/winetype'
 
 const props = defineProps<{
   modelValue?: boolean
@@ -58,8 +76,8 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: boolean): void
-  (e: 'submit', data: Partial<{{.StructName}}>): void
-  (e: '{{.StructName | toLower}}-added', data: Partial<{{.StructName}}>): void
+  (e: 'submit', data: Partial<WineType>): void
+  (e: 'winetype-added', data: Partial<WineType>): void
 }>()
 
 const isOpen = computed({
@@ -71,23 +89,31 @@ const isOpen = computed({
   }
 })
 
-const formData = reactive<Partial<{{.StructName}}>>({
-  {{range .Fields}}
-  {{.JSONName}}: {{if eq .Type "boolean"}}false{{else if eq .Type "number"}}0{{else}}''{{end}},
-  {{end}}
+const formData = reactive<Partial<WineType>>({
+  
+  name: '',
+  
+  description: '',
+  
+  category: '',
+  
 })
 
 function closeModal() {
   isOpen.value = false
   
   // Reset form data
-  {{range .Fields}}
-  formData.{{.JSONName}} = {{if eq .Type "boolean"}}false{{else if eq .Type "number"}}0{{else}}''{{end}}
-  {{end}}
+  
+  formData.name = ''
+  
+  formData.description = ''
+  
+  formData.category = ''
+  
 }
 
 function handleSubmit() {
-  emit('{{.StructName | toLower}}-added', { ...formData })
+  emit('winetype-added', { ...formData })
   closeModal()
 }
 </script>
